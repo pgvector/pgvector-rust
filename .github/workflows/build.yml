@@ -11,7 +11,7 @@ jobs:
         toolchain: stable
     - uses: ankane/setup-postgres@v1
       with:
-        database: pgvector_rs_test
+        database: pgvector_rust_test
     - run: |
         sudo apt-get update && sudo apt-get install postgresql-server-dev-13
         git clone --branch v0.1.5 https://github.com/ankane/pgvector.git

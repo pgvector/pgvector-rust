@@ -82,7 +82,7 @@ mod tests {
         use postgres::NoTls;
 
         let user = std::env::var("USER").unwrap();
-        let mut client = Config::new().host("localhost").dbname("pgvector_rs_test").user(user.as_str()).connect(NoTls).unwrap();
+        let mut client = Config::new().host("localhost").dbname("pgvector_rust_test").user(user.as_str()).connect(NoTls).unwrap();
 
         client.execute("CREATE EXTENSION IF NOT EXISTS vector", &[]).unwrap();
         client.execute("DROP TABLE IF EXISTS t", &[]).unwrap();
