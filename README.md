@@ -1,10 +1,10 @@
-# pgvector.rs
+# pgvector-rust
 
 [pgvector](https://github.com/ankane/pgvector) support for Rust
 
 Supports the [postgres](https://github.com/sfackler/rust-postgres) crate
 
-[![Build Status](https://github.com/ankane/pgvector.rs/workflows/build/badge.svg?branch=master)](https://github.com/ankane/pgvector.rs/actions)
+[![Build Status](https://github.com/ankane/pgvector-rust/workflows/build/badge.svg?branch=master)](https://github.com/ankane/pgvector-rust/actions)
 
 ## Installation
 
@@ -55,21 +55,21 @@ let f32_vec = vec.to_vec();
 
 ## History
 
-View the [changelog](https://github.com/ankane/pgvector.rs/blob/master/CHANGELOG.md)
+View the [changelog](https://github.com/ankane/pgvector-rust/blob/master/CHANGELOG.md)
 
 ## Contributing
 
 Everyone is encouraged to help improve this project. Here are a few ways you can help:
 
-- [Report bugs](https://github.com/ankane/pgvector.rs/issues)
-- Fix bugs and [submit pull requests](https://github.com/ankane/pgvector.rs/pulls)
+- [Report bugs](https://github.com/ankane/pgvector-rust/issues)
+- Fix bugs and [submit pull requests](https://github.com/ankane/pgvector-rust/pulls)
 - Write, clarify, or fix documentation
 - Suggest or add new features
 
 To get started with development:
 
 ```sh
-git clone https://github.com/ankane/pgvector.rs.git
-cd pgvector.rs
+git clone https://github.com/ankane/pgvector-rust.git
+cd pgvector-rust
 cargo test
 ```
