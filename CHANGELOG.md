@@ -1,4 +1,4 @@
-## 0.1.1 (unreleased)
+## 0.1.1 (2021-06-17)
 
 - Added support for Diesel
 
