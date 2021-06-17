@@ -63,7 +63,7 @@ let f32_vec = vec.to_vec();
 Add this line to your application’s `Cargo.toml` under `[dependencies]`:
 
 ```toml
-pgvector = { version = "0.1", features = ["diesel"], default-features = false }
+pgvector = { version = "0.1", features = ["diesel"] }
 ```
 
 And add this line to your application’s `diesel.toml` under `[print_schema]`:
