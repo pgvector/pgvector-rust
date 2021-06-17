@@ -18,4 +18,5 @@ jobs:
         cd pgvector
         make
         sudo make install
-    - run: cargo test
+    - run: cargo test --features postgres
+    - run: cargo test --features diesel

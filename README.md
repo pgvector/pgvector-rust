@@ -2,19 +2,24 @@
 
 [pgvector](https://github.com/ankane/pgvector) support for Rust
 
-Supports the [postgres](https://github.com/sfackler/rust-postgres) crate
+Supports [Rust-Postgres](https://github.com/sfackler/rust-postgres) and [Diesel](https://github.com/diesel-rs/diesel)
 
 [![Build Status](https://github.com/ankane/pgvector-rust/workflows/build/badge.svg?branch=master)](https://github.com/ankane/pgvector-rust/actions)
 
-## Installation
+## Getting Started
+
+Follow the instructions for your database library:
+
+- [Rust-Postgres](#rust-postgres)
+- [Diesel](#diesel)
+
+## Rust-Postgres
 
 Add this line to your application’s `Cargo.toml` under `[dependencies]`:
 
 ```toml
-pgvector = "0.1"
+pgvector = { version = "0.1", features = ["postgres"] }
 ```
-
-## Getting Started
 
 Create a vector from a `Vec<f32>`
 
@@ -53,6 +58,85 @@ Convert a vector to a `Vec<f32>`
 let f32_vec = vec.to_vec();
 ```
 
+## Diesel
+
+Add this line to your application’s `Cargo.toml` under `[dependencies]`:
+
+```toml
+pgvector = { version = "0.1", features = ["diesel"], default-features = false }
+```
+
+And add this line to your application’s `diesel.toml` under `[print_schema]`:
+
+```toml
+import_types = ["diesel::sql_types::*", "pgvector::sql_types::*"]
+```
+
+Create a migration
+
+```sh
+diesel migration generate create_vector_extension
+```
+
+with `up.sql`:
+
+```sql
+CREATE EXTENSION vector
+```
+
+and `down.sql`:
+
+```sql
+DROP EXTENSION vector
+```
+
+Run the migration
+
+```sql
+diesel migration run
+```
+
+You can now use the `vector` type in future migrations
+
+```sql
+CREATE TABLE items (
+  factors VECTOR(3)
+)
+```
+
+For models, use:
+
+```rust
+pub struct Item {
+    pub factors: Option<pgvector::Vector>
+}
+```
+
+Create a vector from a `Vec<f32>`
+
+```rust
+let factors = pgvector::Vector::from(vec![1.0, 2.0, 3.0]);
+```
+
+Insert a vector
+
+```rust
+let new_item = Item {
+    factors: Some(factors)
+};
+
+diesel::insert_into(items::table)
+        .values(&new_item)
+        .get_result(conn)
+        .expect("Error saving new item")
+```
+
+Convert a vector to a `Vec<f32>`
+
+```rust
+let f32_factors = factors.to_vec();
+```
+
 ## History
 
 View the [changelog](https://github.com/ankane/pgvector-rust/blob/master/CHANGELOG.md)
@@ -71,5 +155,6 @@ To get started with development:
 ```sh
 git clone https://github.com/ankane/pgvector-rust.git
 cd pgvector-rust
-cargo test
+cargo test --features postgres
+cargo test --features diesel
 ```
