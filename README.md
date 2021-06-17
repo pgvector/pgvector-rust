@@ -8,7 +8,7 @@ Supports the [postgres](https://github.com/sfackler/rust-postgres) crate
 
 ## Installation
 
-Add this line your application’s `Cargo.toml` under `[dependencies]`:
+Add this line to your application’s `Cargo.toml` under `[dependencies]`:
 
 ```toml
 pgvector = "0.1"
