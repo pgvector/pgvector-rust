@@ -152,6 +152,12 @@ Create a vector from a `Vec<f32>`
 let factors = pgvector::Vector::from(vec![1.0, 2.0, 3.0]);
 ```
 
+Convert a vector to a `Vec<f32>`
+
+```rust
+let f32_factors = factors.to_vec();
+```
+
 Insert a vector
 
 ```rust
@@ -171,12 +177,6 @@ let neighbors = items::table
     .order("factors <-> '[1,2,3]'".into_sql::<Text>())
     .limit(5)
     .load::<Item>(&conn)?;
-```
-
-Convert a vector to a `Vec<f32>`
-
-```rust
-let f32_factors = factors.to_vec();
 ```
 
 ## History
