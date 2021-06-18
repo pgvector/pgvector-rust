@@ -2,7 +2,7 @@
 
 [pgvector](https://github.com/ankane/pgvector) support for Rust
 
-Supports [Rust-Postgres](https://github.com/sfackler/rust-postgres) and [Diesel](https://github.com/diesel-rs/diesel)
+Supports [Rust-Postgres](https://github.com/sfackler/rust-postgres), [SQLx](https://github.com/launchbadge/sqlx), and [Diesel](https://github.com/diesel-rs/diesel)
 
 [![Build Status](https://github.com/ankane/pgvector-rust/workflows/build/badge.svg?branch=master)](https://github.com/ankane/pgvector-rust/actions)
 
@@ -11,6 +11,7 @@ Supports [Rust-Postgres](https://github.com/sfackler/rust-postgres) and [Diesel]
 Follow the instructions for your database library:
 
 - [Rust-Postgres](#rust-postgres)
+- [SQLx](#sqlx)
 - [Diesel](#diesel)
 
 ## Rust-Postgres
@@ -56,6 +57,39 @@ Convert a vector to a `Vec<f32>`
 
 ```rust
 let f32_vec = vec.to_vec();
+```
+
+## SQLx
+
+Add this line to your application’s `Cargo.toml` under `[dependencies]`:
+
+```toml
+pgvector = { version = "0.1", features = ["sqlx"] }
+```
+
+Create a vector from a `Vec<f32>`
+
+```rust
+let vec = pgvector::Vector::from(vec![1.0, 2.0, 3.0]);
+```
+
+Insert a vector
+
+```rust
+sqlx::query("INSERT INTO table (column) VALUES ($1)").bind(vec).execute(&pool).await?;
+```
+
+Get the nearest neighbors
+
+```rust
+let rows = sqlx::query("SELECT * FROM table ORDER BY column <-> $1 LIMIT 1").bind(vec).fetch_all(&pool).await?;
+```
+
+Retrieve a vector
+
+```rust
+let row = sqlx::query("SELECT column FROM table LIMIT 1").fetch_one(&pool).await?;
+let vec: pgvector::Vector = row.try_get("column").unwrap();
 ```
 
 ## Diesel
@@ -156,5 +190,6 @@ To get started with development:
 git clone https://github.com/ankane/pgvector-rust.git
 cd pgvector-rust
 cargo test --features postgres
+cargo test --features sqlx
 cargo test --features diesel
 ```
