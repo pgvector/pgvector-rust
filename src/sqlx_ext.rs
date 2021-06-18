@@ -55,9 +55,13 @@ mod tests {
         assert_eq!(vec![1.0, 2.0, 3.0], res_vec.to_vec());
 
         let empty_vec = Vector::from(vec![]);
-        let empty_res = sqlx::query("INSERT INTO t (c) VALUES ($1)").bind(&empty_vec).execute(&pool).await;
+        let empty_res = sqlx::query("INSERT INTO t2 (c) VALUES ($1)").bind(&empty_vec).execute(&pool).await;
         assert!(empty_res.is_err());
         assert!(empty_res.unwrap_err().to_string().contains("vector must have at least 1 dimension"));
+
+        let null_row = sqlx::query("SELECT c from t2 WHERE c IS NULL LIMIT 1").fetch_one(&pool).await?;
+        let null_res: Option<Vector> = null_row.try_get("c").unwrap();
+        assert!(null_res.is_none());
 
         Ok(())
     }
