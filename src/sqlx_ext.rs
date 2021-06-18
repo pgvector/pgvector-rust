@@ -33,7 +33,7 @@ impl Encode<'_, Postgres> for Vector {
 impl Decode<'_, Postgres> for Vector {
     fn decode(value: PgValueRef<'_>) -> Result<Self, BoxDynError> {
         let buf = <&[u8] as Decode<Postgres>>::decode(value)?;
-        crate::decode_vector(buf).map_err(|e| e.into())
+        Vector::from_sql(buf).map_err(|e| e.into())
     }
 }
 

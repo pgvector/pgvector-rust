@@ -34,7 +34,7 @@ impl ToSql<VectorType, Pg> for Vector {
 impl FromSql<VectorType, Pg> for Vector {
     fn from_sql(bytes: Option<&[u8]>) -> deserialize::Result<Self> {
         let buf = not_none!(bytes);
-        crate::decode_vector(buf).map_err(|e| e.into())
+        Vector::from_sql(buf).map_err(|e| e.into())
     }
 }
 
