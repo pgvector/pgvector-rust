@@ -89,7 +89,7 @@ Retrieve a vector
 
 ```rust
 let row = sqlx::query("SELECT column FROM table LIMIT 1").fetch_one(&pool).await?;
-let vec: pgvector::Vector = row.try_get("column").unwrap();
+let vec: pgvector::Vector = row.try_get("column")?;
 ```
 
 ## Diesel
@@ -160,9 +160,17 @@ let new_item = Item {
 };
 
 diesel::insert_into(items::table)
-        .values(&new_item)
-        .get_result(conn)
-        .expect("Error saving new item")
+    .values(&new_item)
+    .get_result(&conn)?;
+```
+
+Get the nearest neighbors
+
+```rust
+let neighbors = items::table
+    .order("factors <-> '[1,2,3]'".into_sql::<Text>())
+    .limit(5)
+    .load::<Item>(&conn)?;
 ```
 
 Convert a vector to a `Vec<f32>`

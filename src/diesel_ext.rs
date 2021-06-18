@@ -48,8 +48,8 @@ mod tests {
     fn it_works() {
         use crate::Vector;
         use diesel::pg::PgConnection;
-        use diesel::Connection;
-        use diesel::RunQueryDsl;
+        use diesel::sql_types::Text;
+        use diesel::{Connection, IntoSql, QueryDsl, RunQueryDsl};
 
         let conn = PgConnection::establish("postgres://localhost/pgvector_rust_test").unwrap();
         conn.execute("CREATE EXTENSION IF NOT EXISTS vector").unwrap();
@@ -69,9 +69,16 @@ mod tests {
 
         assert_eq!(new_item, item);
 
-        let rows = items::table.load::<Item>(&conn).unwrap();
-        assert_eq!(1, rows.len());
-        assert_eq!(1, rows[0].id);
-        assert_eq!(new_item.factors, rows[0].factors);
+        let all = items::table.load::<Item>(&conn).unwrap();
+        assert_eq!(1, all.len());
+        assert_eq!(1, all[0].id);
+        assert_eq!(new_item.factors, all[0].factors);
+
+        let neighbors = items::table
+            .order("factors <-> '[1,2,3]'".into_sql::<Text>())
+            .limit(5)
+            .load::<Item>(&conn)
+            .unwrap();
+        assert_eq!(1, neighbors.len());
     }
 }
