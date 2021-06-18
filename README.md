@@ -155,7 +155,7 @@ let new_item = Item {
 
 diesel::insert_into(items::table)
     .values(&new_item)
-    .get_result(&conn)?;
+    .get_result::<Item>(&conn)?;
 ```
 
 Get the nearest neighbors
