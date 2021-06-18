@@ -171,7 +171,7 @@ let neighbors = items::table
 
 Also supports `max_inner_product` and `cosine_distance`
 
-Add an approximate index
+Add an approximate index in a migration
 
 ```sql
 CREATE INDEX my_index ON items USING ivfflat (factors vector_l2_ops);
