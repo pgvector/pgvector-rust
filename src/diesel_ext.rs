@@ -1,4 +1,4 @@
-use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
+use byteorder::{BigEndian, WriteBytesExt};
 use diesel::deserialize::{self, FromSql};
 use diesel::pg::Pg;
 use diesel::serialize::{self, IsNull, Output, ToSql};
@@ -33,19 +33,8 @@ impl ToSql<VectorType, Pg> for Vector {
 
 impl FromSql<VectorType, Pg> for Vector {
     fn from_sql(bytes: Option<&[u8]>) -> deserialize::Result<Self> {
-        let mut buf = not_none!(bytes);
-        let dim = buf.read_u16::<BigEndian>()?;
-        let unused = buf.read_u16::<BigEndian>()?;
-        if unused != 0 {
-            return Err("expected unused to be 0".into());
-        }
-
-        let mut vec = Vec::new();
-        for _ in 0..dim {
-            vec.push(buf.read_f32::<BigEndian>()?);
-        }
-
-        Ok(Vector(vec))
+        let buf = not_none!(bytes);
+        crate::decode_vector(buf).map_err(|e| e.into())
     }
 }
 

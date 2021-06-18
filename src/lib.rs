@@ -1,4 +1,6 @@
+use byteorder::{BigEndian, ReadBytesExt};
 use std::cmp::PartialEq;
+use std::io::{Error, ErrorKind};
 
 #[cfg(feature = "diesel")]
 #[macro_use]
@@ -28,6 +30,21 @@ impl PartialEq for Vector {
     fn eq(&self, other: &Self) -> bool {
         self.0 == other.0
     }
+}
+
+fn decode_vector(mut buf: &[u8]) -> std::io::Result<Vector> {
+    let dim = buf.read_u16::<BigEndian>()?;
+    let unused = buf.read_u16::<BigEndian>()?;
+    if unused != 0 {
+        return Err(Error::new(ErrorKind::Other, "expected unused to be 0"));
+    }
+
+    let mut vec = Vec::new();
+    for _ in 0..dim {
+        vec.push(buf.read_f32::<BigEndian>()?);
+    }
+
+    Ok(Vector(vec))
 }
 
 #[cfg(feature = "postgres")]

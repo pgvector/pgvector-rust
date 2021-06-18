@@ -1,4 +1,3 @@
-use byteorder::{BigEndian, ReadBytesExt};
 use bytes::{BufMut, BytesMut};
 use postgres::types::{to_sql_checked, FromSql, IsNull, ToSql, Type};
 use std::convert::TryInto;
@@ -8,19 +7,7 @@ use crate::Vector;
 
 impl<'a> FromSql<'a> for Vector {
     fn from_sql(_ty: &Type, raw: &'a [u8]) -> Result<Vector, Box<dyn Error + Sync + Send>> {
-        let mut buf = raw;
-        let dim = buf.read_u16::<BigEndian>()?;
-        let unused = buf.read_u16::<BigEndian>()?;
-        if unused != 0 {
-            return Err("expected unused to be 0".into());
-        }
-
-        let mut vec = Vec::new();
-        for _ in 0..dim {
-            vec.push(buf.read_f32::<BigEndian>()?);
-        }
-
-        Ok(Vector(vec))
+        crate::decode_vector(raw).map_err(|e| e.into())
     }
 
     fn accepts(ty: &Type) -> bool {
