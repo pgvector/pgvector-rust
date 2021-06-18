@@ -78,30 +78,45 @@ mod tests {
         conn.execute("DROP TABLE IF EXISTS items").unwrap();
         conn.execute("CREATE TABLE items (id serial primary key, factors vector(3))").unwrap();
 
-        let factors = Vector::from(vec![1.0, 2.0, 3.0]);
-        let new_item = Item {
-            id: 1,
-            factors: Some(factors)
-        };
+        let new_items = vec![
+            Item {
+                id: 1,
+                factors: Some(Vector::from(vec![1.0, 1.0, 1.0]))
+            },
+            Item {
+                id: 2,
+                factors: Some(Vector::from(vec![2.0, 2.0, 2.0]))
+            },
+            Item {
+                id: 3,
+                factors: Some(Vector::from(vec![1.0, 1.0, 2.0]))
+            },
+        ];
 
-        let item: Item = diesel::insert_into(items::table)
-            .values(&new_item)
-            .get_result(&conn)
-            .unwrap();
-
-        assert_eq!(new_item, item);
+        diesel::insert_into(items::table).values(&new_items).get_results::<Item>(&conn).unwrap();
 
         let all = items::table.load::<Item>(&conn).unwrap();
-        assert_eq!(1, all.len());
-        assert_eq!(1, all[0].id);
-        assert_eq!(new_item.factors, all[0].factors);
+        assert_eq!(3, all.len());
 
-        let query = Vector::from(vec![1.0, 2.0, 3.0]);
         let neighbors = items::table
-            .order(items::factors.l2_distance(query))
+            .order(items::factors.l2_distance(Vector::from(vec![1.0, 1.0, 1.0])))
             .limit(5)
             .load::<Item>(&conn)
             .unwrap();
-        assert_eq!(1, neighbors.len());
+        assert_eq!(vec![1, 3, 2], neighbors.into_iter().map(|v| v.id).collect::<Vec<i32>>());
+
+        let neighbors = items::table
+            .order(items::factors.max_inner_product(Vector::from(vec![1.0, 1.0, 1.0])))
+            .limit(5)
+            .load::<Item>(&conn)
+            .unwrap();
+        assert_eq!(vec![2, 3, 1], neighbors.into_iter().map(|v| v.id).collect::<Vec<i32>>());
+
+        let neighbors = items::table
+            .order(items::factors.cosine_distance(Vector::from(vec![1.0, 1.0, 1.0])))
+            .limit(5)
+            .load::<Item>(&conn)
+            .unwrap();
+        assert_eq!(vec![1, 2, 3], neighbors.into_iter().map(|v| v.id).collect::<Vec<i32>>());
     }
 }
