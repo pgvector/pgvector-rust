@@ -53,12 +53,6 @@ Use `Option` if the value could be `NULL`
 let res: Option<pgvector::Vector> = row.get(0);
 ```
 
-Convert a vector to a `Vec<f32>`
-
-```rust
-let f32_vec = vec.to_vec();
-```
-
 ## SQLx
 
 Add this line to your application’s `Cargo.toml` under `[dependencies]`:
@@ -152,12 +146,6 @@ Create a vector from a `Vec<f32>`
 let factors = pgvector::Vector::from(vec![1.0, 2.0, 3.0]);
 ```
 
-Convert a vector to a `Vec<f32>`
-
-```rust
-let f32_factors = factors.to_vec();
-```
-
 Insert a vector
 
 ```rust
@@ -182,6 +170,14 @@ let neighbors = items::table
 ```
 
 Also supports `max_inner_product` and `cosine_distance`
+
+## Reference
+
+Convert a vector to a `Vec<f32>`
+
+```rust
+let f32_vec = vec.to_vec();
+```
 
 ## History
 
