@@ -68,5 +68,10 @@ mod tests {
             .unwrap();
 
         assert_eq!(new_item, item);
+
+        let rows = items::table.load::<Item>(&conn).unwrap();
+        assert_eq!(1, rows.len());
+        assert_eq!(1, rows[0].id);
+        assert_eq!(new_item.factors, rows[0].factors);
     }
 }
