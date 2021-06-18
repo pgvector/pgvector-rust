@@ -1,6 +1,5 @@
-use bytes::{BufMut, BytesMut};
+use bytes::{BytesMut};
 use postgres::types::{to_sql_checked, FromSql, IsNull, ToSql, Type};
-use std::convert::TryInto;
 use std::error::Error;
 
 use crate::Vector;
@@ -17,19 +16,7 @@ impl<'a> FromSql<'a> for Vector {
 
 impl ToSql for Vector {
     fn to_sql(&self, _ty: &Type, w: &mut BytesMut) -> Result<IsNull, Box<dyn Error + Sync + Send>> {
-        let dim = self.0.len();
-        if dim > 1024 {
-            return Err("vector cannot have more than 1024 dimensions".into())
-        }
-        if dim < 1 {
-            return Err("vector must have at least 1 dimension".into())
-        }
-
-        w.put_u16(dim.try_into()?);
-        w.put_u16(0);
-        for v in self.0.iter() {
-            w.put_f32(*v);
-        }
+        self.to_sql(w)?;
         Ok(IsNull::No)
     }
 
