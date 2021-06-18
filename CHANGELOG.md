@@ -1,6 +1,7 @@
 ## 0.1.2 (unreleased)
 
 - Added support for SQLx
+- Added operators for Diesel
 
 ## 0.1.1 (2021-06-17)
 

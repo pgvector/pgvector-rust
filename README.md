@@ -173,11 +173,15 @@ diesel::insert_into(items::table)
 Get the nearest neighbors
 
 ```rust
+use pgvector::VectorExpressionMethods;
+
 let neighbors = items::table
-    .order("factors <-> '[1,2,3]'".into_sql::<Text>())
+    .order(items::factors.l2_distance(factors))
     .limit(5)
     .load::<Item>(&conn)?;
 ```
+
+Also supports `max_inner_product` and `cosine_distance`
 
 ## History
 

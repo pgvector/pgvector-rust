@@ -74,3 +74,6 @@ mod diesel_ext;
 pub mod sql_types {
     pub use super::diesel_ext::VectorType as Vector;
 }
+
+#[cfg(feature = "diesel")]
+pub use diesel_ext::VectorExpressionMethods;

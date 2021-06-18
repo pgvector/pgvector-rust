@@ -1,12 +1,13 @@
 use bytes::{BytesMut};
 use diesel::deserialize::{self, FromSql};
+use diesel::expression::{AsExpression, Expression};
 use diesel::pg::Pg;
 use diesel::serialize::{self, IsNull, Output, ToSql};
 use std::io::Write;
 
 use crate::Vector;
 
-#[derive(SqlType)]
+#[derive(SqlType, QueryId)]
 #[postgres(type_name = "Vector")]
 pub struct VectorType;
 
@@ -25,6 +26,27 @@ impl FromSql<VectorType, Pg> for Vector {
         Vector::from_sql(buf).map_err(|e| e.into())
     }
 }
+
+diesel_infix_operator!(L2Distance, " <-> ", backend: Pg);
+diesel_infix_operator!(MaxInnerProduct, " <#> ", backend: Pg);
+diesel_infix_operator!(CosineDistance, " <=> ", backend: Pg);
+
+// don't specify a SqlType since it won't work with Nullable<Vector>
+pub trait VectorExpressionMethods: Expression + Sized {
+    fn l2_distance<T: AsExpression<Self::SqlType>>(self, other: T) -> L2Distance<Self, T::Expression> {
+        L2Distance::new(self, other.as_expression())
+    }
+
+    fn max_inner_product<T: AsExpression<Self::SqlType>>(self, other: T) -> MaxInnerProduct<Self, T::Expression> {
+        MaxInnerProduct::new(self, other.as_expression())
+    }
+
+    fn cosine_distance<T: AsExpression<Self::SqlType>>(self, other: T) -> CosineDistance<Self, T::Expression> {
+        CosineDistance::new(self, other.as_expression())
+    }
+}
+
+impl<T: Expression> VectorExpressionMethods for T {}
 
 #[cfg(test)]
 mod tests {
@@ -47,9 +69,9 @@ mod tests {
     #[test]
     fn it_works() {
         use crate::Vector;
+        use crate::VectorExpressionMethods;
         use diesel::pg::PgConnection;
-        use diesel::sql_types::Text;
-        use diesel::{Connection, IntoSql, QueryDsl, RunQueryDsl};
+        use diesel::{Connection, QueryDsl, RunQueryDsl};
 
         let conn = PgConnection::establish("postgres://localhost/pgvector_rust_test").unwrap();
         conn.execute("CREATE EXTENSION IF NOT EXISTS vector").unwrap();
@@ -74,8 +96,9 @@ mod tests {
         assert_eq!(1, all[0].id);
         assert_eq!(new_item.factors, all[0].factors);
 
+        let query = Vector::from(vec![1.0, 2.0, 3.0]);
         let neighbors = items::table
-            .order("factors <-> '[1,2,3]'".into_sql::<Text>())
+            .order(items::factors.l2_distance(query))
             .limit(5)
             .load::<Item>(&conn)
             .unwrap();
