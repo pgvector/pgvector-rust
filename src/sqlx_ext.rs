@@ -54,6 +54,11 @@ mod tests {
         assert_eq!(vec, res_vec);
         assert_eq!(vec![1.0, 2.0, 3.0], res_vec.to_vec());
 
+        let empty_vec = Vector::from(vec![]);
+        let empty_res = sqlx::query("INSERT INTO t (c) VALUES ($1)").bind(&empty_vec).execute(&pool).await;
+        assert!(empty_res.is_err());
+        assert!(empty_res.unwrap_err().to_string().contains("vector must have at least 1 dimension"));
+
         Ok(())
     }
 }

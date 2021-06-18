@@ -44,15 +44,9 @@ impl Vector {
 
     fn to_sql(&self, w: &mut BytesMut) -> Result<(), Box<dyn Error + Sync + Send>> {
         let dim = self.0.len();
-        if dim > 1024 {
-            return Err("vector cannot have more than 1024 dimensions".into())
-        }
-        if dim < 1 {
-            return Err("vector must have at least 1 dimension".into())
-        }
-
         w.put_u16(dim.try_into()?);
         w.put_u16(0);
+
         for v in self.0.iter() {
             w.put_f32(*v);
         }
