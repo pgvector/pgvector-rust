@@ -171,6 +171,14 @@ let neighbors = items::table
 
 Also supports `max_inner_product` and `cosine_distance`
 
+Add an approximate index
+
+```sql
+CREATE INDEX my_index ON items USING ivfflat (factors vector_l2_ops);
+```
+
+Use `vector_ip_ops` for inner product and `vector_cosine_ops` for cosine distance
+
 ## Reference
 
 Convert a vector to a `Vec<f32>`
