@@ -14,7 +14,7 @@ pub struct VectorType;
 impl ToSql<VectorType, Pg> for Vector {
     fn to_sql<W: Write>(&self, out: &mut Output<W, Pg>) -> serialize::Result {
         let mut w = BytesMut::new();
-        self.to_sql(&mut w).unwrap();
+        self.to_sql(&mut w)?;
         out.write_all(&w)?;
         Ok(IsNull::No)
     }
