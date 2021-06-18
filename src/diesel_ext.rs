@@ -28,7 +28,45 @@ impl FromSql<VectorType, Pg> for Vector {
 
 #[cfg(test)]
 mod tests {
+    table! {
+        use diesel::sql_types::*;
+
+        items (id) {
+            id -> Int4,
+            factors -> Nullable<crate::sql_types::Vector>,
+        }
+    }
+
+    #[derive(Debug, Insertable, PartialEq, Queryable)]
+    #[table_name="items"]
+    struct Item {
+        pub id: i32,
+        pub factors: Option<crate::Vector>
+    }
+
     #[test]
     fn it_works() {
+        use crate::Vector;
+        use diesel::pg::PgConnection;
+        use diesel::Connection;
+        use diesel::RunQueryDsl;
+
+        let conn = PgConnection::establish("postgres://localhost/pgvector_rust_test").unwrap();
+        conn.execute("CREATE EXTENSION IF NOT EXISTS vector").unwrap();
+        conn.execute("DROP TABLE IF EXISTS items").unwrap();
+        conn.execute("CREATE TABLE items (id serial primary key, factors vector(3))").unwrap();
+
+        let factors = Vector::from(vec![1.0, 2.0, 3.0]);
+        let new_item = Item {
+            id: 1,
+            factors: Some(factors)
+        };
+
+        let item: Item = diesel::insert_into(items::table)
+            .values(&new_item)
+            .get_result(&conn)
+            .unwrap();
+
+        assert_eq!(new_item, item);
     }
 }
