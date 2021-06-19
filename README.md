@@ -76,7 +76,8 @@ sqlx::query("INSERT INTO table (column) VALUES ($1)").bind(vec).execute(&pool).a
 Get the nearest neighbors
 
 ```rust
-let rows = sqlx::query("SELECT * FROM table ORDER BY column <-> $1 LIMIT 1").bind(vec).fetch_all(&pool).await?;
+let rows = sqlx::query("SELECT * FROM table ORDER BY column <-> $1 LIMIT 1")
+    .bind(vec).fetch_all(&pool).await?;
 ```
 
 Retrieve a vector
@@ -205,7 +206,5 @@ To get started with development:
 ```sh
 git clone https://github.com/ankane/pgvector-rust.git
 cd pgvector-rust
-cargo test --features postgres
-cargo test --features sqlx
-cargo test --features diesel
+cargo test --all-features
 ```
