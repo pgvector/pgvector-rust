@@ -1,3 +1,7 @@
+## 0.1.3 (unreleased)
+
+- Fixed SQL type of Diesel operators
+
 ## 0.1.2 (2021-06-18)
 
 - Added support for SQLx

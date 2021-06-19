@@ -3,6 +3,7 @@ use diesel::deserialize::{self, FromSql};
 use diesel::expression::{AsExpression, Expression};
 use diesel::pg::Pg;
 use diesel::serialize::{self, IsNull, Output, ToSql};
+use diesel::sql_types::Double;
 use std::io::Write;
 
 use crate::Vector;
@@ -27,9 +28,9 @@ impl FromSql<VectorType, Pg> for Vector {
     }
 }
 
-diesel_infix_operator!(L2Distance, " <-> ", backend: Pg);
-diesel_infix_operator!(MaxInnerProduct, " <#> ", backend: Pg);
-diesel_infix_operator!(CosineDistance, " <=> ", backend: Pg);
+diesel_infix_operator!(L2Distance, " <-> ", Double, backend: Pg);
+diesel_infix_operator!(MaxInnerProduct, " <#> ", Double, backend: Pg);
+diesel_infix_operator!(CosineDistance, " <=> ", Double, backend: Pg);
 
 // don't specify a SqlType since it won't work with Nullable<Vector>
 pub trait VectorExpressionMethods: Expression + Sized {
@@ -118,5 +119,12 @@ mod tests {
             .load::<Item>(&conn)
             .unwrap();
         assert_eq!(vec![1, 2, 3], neighbors.into_iter().map(|v| v.id).collect::<Vec<i32>>());
+
+        let distances = items::table
+            .select(items::factors.max_inner_product(Vector::from(vec![1.0, 1.0, 1.0])))
+            .order(items::id)
+            .load::<f64>(&conn)
+            .unwrap();
+        assert_eq!(vec![-3.0, -6.0, -4.0], distances);
     }
 }
