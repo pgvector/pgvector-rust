@@ -172,6 +172,14 @@ let neighbors = items::table
 
 Also supports `max_inner_product` and `cosine_distance`
 
+Get the distances
+
+```rust
+let distances = items::table
+    .select(items::factors.l2_distance(factors))
+    .load::<f64>(&conn)?;
+```
+
 Add an approximate index in a migration
 
 ```sql
