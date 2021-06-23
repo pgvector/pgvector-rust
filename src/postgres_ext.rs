@@ -60,5 +60,10 @@ mod tests {
         let null_row = client.query_one("SELECT c from t WHERE c IS NULL LIMIT 1", &[]).unwrap();
         let null_res: Option<Vector> = null_row.get(0);
         assert!(null_res.is_none());
+
+        // ensures binary format is correct
+        let text_row = client.query_one("SELECT c::text from t ORDER BY id LIMIT 1", &[]).unwrap();
+        let text_res: String = text_row.get(0);
+        assert_eq!("[1,2,3]", text_res);
     }
 }
