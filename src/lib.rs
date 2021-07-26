@@ -1,3 +1,7 @@
+//! pgvector support for Rust
+//!
+//! [View the docs](https://github.com/ankane/pgvector-rust)
+
 #[cfg(feature = "diesel")]
 #[macro_use]
 extern crate diesel;
