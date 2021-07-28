@@ -64,7 +64,7 @@ mod tests {
         assert!(null_res.is_none());
 
         // ensures binary format is correct
-        let text_row = sqlx::query("SELECT c::text from t ORDER BY id LIMIT 1").fetch_one(&pool).await?;
+        let text_row = sqlx::query("SELECT c::text from t2 ORDER BY id LIMIT 1").fetch_one(&pool).await?;
         let text_res: String = text_row.try_get("c").unwrap();
         assert_eq!("[1,2,3]", text_res);
 
