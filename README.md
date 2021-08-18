@@ -214,5 +214,6 @@ To get started with development:
 ```sh
 git clone https://github.com/ankane/pgvector-rust.git
 cd pgvector-rust
+createdb pgvector_rust_test
 cargo test --all-features
 ```
