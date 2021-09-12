@@ -1,4 +1,4 @@
-use bytes::{BytesMut};
+use bytes::BytesMut;
 use postgres::types::{to_sql_checked, FromSql, IsNull, ToSql, Type};
 use std::error::Error;
 

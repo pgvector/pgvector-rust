@@ -1,4 +1,4 @@
-use bytes::{BytesMut};
+use bytes::BytesMut;
 use diesel::deserialize::{self, FromSql};
 use diesel::expression::{AsExpression, Expression};
 use diesel::pg::Pg;

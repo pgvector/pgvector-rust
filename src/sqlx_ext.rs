@@ -1,8 +1,8 @@
-use bytes::{BytesMut};
-use sqlx::{Decode, Encode, Postgres, Type};
+use bytes::BytesMut;
 use sqlx::encode::IsNull;
 use sqlx::error::BoxDynError;
 use sqlx::postgres::{PgArgumentBuffer, PgTypeInfo, PgValueRef};
+use sqlx::{Decode, Encode, Postgres, Type};
 
 use crate::Vector;
 
