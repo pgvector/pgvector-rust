@@ -30,10 +30,8 @@ impl Vector {
             return Err("expected unused to be 0".into());
         }
 
-        let mut vec = Vec::new();
-        for _ in 0..dim {
-            vec.push(buf.read_f32::<BigEndian>()?);
-        }
+        let mut vec = vec![0.0; dim as usize];
+        buf.read_f32_into::<BigEndian>(&mut vec)?;
 
         Ok(Vector(vec))
     }
