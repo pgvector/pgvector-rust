@@ -18,6 +18,12 @@ impl From<Vec<f32>> for Vector {
     }
 }
 
+impl Into<Vec<f32>> for Vector {
+    fn into(self) -> Vec<f32> {
+        self.0
+    }
+}
+
 impl Vector {
     pub fn to_vec(&self) -> Vec<f32> {
         self.0.clone()
@@ -52,5 +58,23 @@ impl Vector {
 impl PartialEq for Vector {
     fn eq(&self, other: &Self) -> bool {
         self.0 == other.0
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::Vector;
+
+    #[test]
+    fn test_into() {
+        let vec = Vector::from(vec![1.0, 2.0, 3.0]);
+        let f32_vec: Vec<f32> = vec.into();
+        assert_eq!(f32_vec, vec![1.0, 2.0, 3.0]);
+    }
+
+    #[test]
+    fn test_to_vec() {
+        let vec = Vector::from(vec![1.0, 2.0, 3.0]);
+        assert_eq!(vec.to_vec(), vec![1.0, 2.0, 3.0]);
     }
 }

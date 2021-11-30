@@ -1,3 +1,7 @@
+## 0.1.4 (unreleased)
+
+- Added `into`
+
 ## 0.1.3 (2021-06-22)
 
 - Fixed SQL type of Diesel operators
