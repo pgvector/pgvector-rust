@@ -6,7 +6,7 @@ use crate::Vector;
 
 impl<'a> FromSql<'a> for Vector {
     fn from_sql(_ty: &Type, raw: &'a [u8]) -> Result<Vector, Box<dyn Error + Sync + Send>> {
-        Vector::from_sql(raw).map_err(|e| e.into())
+        Vector::from_sql(raw)
     }
 
     fn accepts(ty: &Type) -> bool {
