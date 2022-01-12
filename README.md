@@ -193,7 +193,7 @@ Use `vector_ip_ops` for inner product and `vector_cosine_ops` for cosine distanc
 Convert a vector to a `Vec<f32>`
 
 ```rust
-let f32_vec = vec.to_vec();
+let f32_vec: Vec<f32> = vec.into();
 ```
 
 ## History
