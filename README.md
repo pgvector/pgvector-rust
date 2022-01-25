@@ -1,10 +1,10 @@
 # pgvector-rust
 
-[pgvector](https://github.com/ankane/pgvector) support for Rust
+[pgvector](https://github.com/pgvector/pgvector) support for Rust
 
 Supports [Rust-Postgres](https://github.com/sfackler/rust-postgres), [SQLx](https://github.com/launchbadge/sqlx), and [Diesel](https://github.com/diesel-rs/diesel)
 
-[![Build Status](https://github.com/ankane/pgvector-rust/workflows/build/badge.svg?branch=master)](https://github.com/ankane/pgvector-rust/actions)
+[![Build Status](https://github.com/pgvector/pgvector-rust/workflows/build/badge.svg?branch=master)](https://github.com/pgvector/pgvector-rust/actions)
 
 ## Getting Started
 
@@ -198,21 +198,21 @@ let f32_vec: Vec<f32> = vec.into();
 
 ## History
 
-View the [changelog](https://github.com/ankane/pgvector-rust/blob/master/CHANGELOG.md)
+View the [changelog](https://github.com/pgvector/pgvector-rust/blob/master/CHANGELOG.md)
 
 ## Contributing
 
 Everyone is encouraged to help improve this project. Here are a few ways you can help:
 
-- [Report bugs](https://github.com/ankane/pgvector-rust/issues)
-- Fix bugs and [submit pull requests](https://github.com/ankane/pgvector-rust/pulls)
+- [Report bugs](https://github.com/pgvector/pgvector-rust/issues)
+- Fix bugs and [submit pull requests](https://github.com/pgvector/pgvector-rust/pulls)
 - Write, clarify, or fix documentation
 - Suggest or add new features
 
 To get started with development:
 
 ```sh
-git clone https://github.com/ankane/pgvector-rust.git
+git clone https://github.com/pgvector/pgvector-rust.git
 cd pgvector-rust
 createdb pgvector_rust_test
 cargo test --all-features

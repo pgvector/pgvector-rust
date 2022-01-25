@@ -1,6 +1,6 @@
 //! pgvector support for Rust
 //!
-//! [View the docs](https://github.com/ankane/pgvector-rust)
+//! [View the docs](https://github.com/pgvector/pgvector-rust)
 
 #[cfg(feature = "diesel")]
 #[macro_use]

@@ -2,7 +2,7 @@
 name = "pgvector"
 version = "0.1.4"
 description = "pgvector support for Rust"
-repository = "https://github.com/ankane/pgvector-rust"
+repository = "https://github.com/pgvector/pgvector-rust"
 license = "MIT OR Apache-2.0"
 authors = ["Andrew Kane <andrew@ankane.org>"]
 edition = "2018"
