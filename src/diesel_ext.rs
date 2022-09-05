@@ -104,39 +104,43 @@ mod tests {
                 id: 3,
                 factors: Some(Vector::from(vec![1.0, 1.0, 2.0]))
             },
+            Item {
+                id: 4,
+                factors: None
+            },
         ];
 
         diesel::insert_into(items::table).values(&new_items).get_results::<Item>(&mut conn).unwrap();
 
         let all = items::table.load::<Item>(&mut conn).unwrap();
-        assert_eq!(3, all.len());
+        assert_eq!(4, all.len());
 
         let neighbors = items::table
             .order(items::factors.l2_distance(Vector::from(vec![1.0, 1.0, 1.0])))
             .limit(5)
             .load::<Item>(&mut conn)
             .unwrap();
-        assert_eq!(vec![1, 3, 2], neighbors.into_iter().map(|v| v.id).collect::<Vec<i32>>());
+        assert_eq!(vec![1, 3, 2, 4], neighbors.into_iter().map(|v| v.id).collect::<Vec<i32>>());
 
         let neighbors = items::table
             .order(items::factors.max_inner_product(Vector::from(vec![1.0, 1.0, 1.0])))
             .limit(5)
             .load::<Item>(&mut conn)
             .unwrap();
-        assert_eq!(vec![2, 3, 1], neighbors.into_iter().map(|v| v.id).collect::<Vec<i32>>());
+        assert_eq!(vec![2, 3, 1, 4], neighbors.into_iter().map(|v| v.id).collect::<Vec<i32>>());
 
         let neighbors = items::table
             .order(items::factors.cosine_distance(Vector::from(vec![1.0, 1.0, 1.0])))
             .limit(5)
             .load::<Item>(&mut conn)
             .unwrap();
-        assert_eq!(vec![1, 2, 3], neighbors.into_iter().map(|v| v.id).collect::<Vec<i32>>());
+        assert_eq!(vec![1, 2, 3, 4], neighbors.into_iter().map(|v| v.id).collect::<Vec<i32>>());
 
         let distances = items::table
             .select(items::factors.max_inner_product(Vector::from(vec![1.0, 1.0, 1.0])))
             .order(items::id)
             .load::<Option<f64>>(&mut conn)
             .unwrap();
-        assert_eq!(vec![Some(-3.0), Some(-6.0), Some(-4.0)], distances);
+        assert_eq!(vec![Some(-3.0), Some(-6.0), Some(-4.0), None], distances);
     }
 }
