@@ -9,7 +9,7 @@ use crate::diesel_ext::VectorType;
 
 #[derive(Debug)]
 #[cfg_attr(feature = "diesel", derive(FromSqlRow, AsExpression))]
-#[cfg_attr(feature = "diesel", sql_type = "VectorType")]
+#[cfg_attr(feature = "diesel", diesel(sql_type = VectorType))]
 pub struct Vector(Vec<f32>);
 
 impl From<Vec<f32>> for Vector {

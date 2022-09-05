@@ -1,19 +1,20 @@
 use bytes::BytesMut;
+use diesel::backend;
 use diesel::deserialize::{self, FromSql};
 use diesel::expression::{AsExpression, Expression};
 use diesel::pg::Pg;
 use diesel::serialize::{self, IsNull, Output, ToSql};
-use diesel::sql_types::Double;
+use diesel::sql_types::{Double, SqlType};
 use std::io::Write;
 
 use crate::Vector;
 
 #[derive(SqlType, QueryId)]
-#[postgres(type_name = "Vector")]
+#[diesel(postgres_type(name = "vector"))]
 pub struct VectorType;
 
 impl ToSql<VectorType, Pg> for Vector {
-    fn to_sql<W: Write>(&self, out: &mut Output<W, Pg>) -> serialize::Result {
+    fn to_sql<'b>(&'b self, out: &mut Output<'b, '_, Pg>) -> serialize::Result {
         let mut w = BytesMut::new();
         self.to_sql(&mut w)?;
         out.write_all(&w)?;
@@ -22,27 +23,38 @@ impl ToSql<VectorType, Pg> for Vector {
 }
 
 impl FromSql<VectorType, Pg> for Vector {
-    fn from_sql(bytes: Option<&[u8]>) -> deserialize::Result<Self> {
-        let buf = not_none!(bytes);
-        Vector::from_sql(buf)
+    fn from_sql(value: backend::RawValue<'_, Pg>) -> deserialize::Result<Self> {
+        Vector::from_sql(value.as_bytes())
     }
 }
 
-diesel_infix_operator!(L2Distance, " <-> ", Double, backend: Pg);
-diesel_infix_operator!(MaxInnerProduct, " <#> ", Double, backend: Pg);
-diesel_infix_operator!(CosineDistance, " <=> ", Double, backend: Pg);
+diesel::infix_operator!(L2Distance, " <-> ", Double, backend: Pg);
+diesel::infix_operator!(MaxInnerProduct, " <#> ", Double, backend: Pg);
+diesel::infix_operator!(CosineDistance, " <=> ", Double, backend: Pg);
 
 // don't specify a SqlType since it won't work with Nullable<Vector>
 pub trait VectorExpressionMethods: Expression + Sized {
-    fn l2_distance<T: AsExpression<Self::SqlType>>(self, other: T) -> L2Distance<Self, T::Expression> {
+    fn l2_distance<T>(self, other: T) -> L2Distance<Self, T::Expression>
+    where
+        Self::SqlType: SqlType,
+        T: AsExpression<Self::SqlType>,
+    {
         L2Distance::new(self, other.as_expression())
     }
 
-    fn max_inner_product<T: AsExpression<Self::SqlType>>(self, other: T) -> MaxInnerProduct<Self, T::Expression> {
+    fn max_inner_product<T>(self, other: T) -> MaxInnerProduct<Self, T::Expression>
+    where
+        Self::SqlType: SqlType,
+        T: AsExpression<Self::SqlType>,
+    {
         MaxInnerProduct::new(self, other.as_expression())
     }
 
-    fn cosine_distance<T: AsExpression<Self::SqlType>>(self, other: T) -> CosineDistance<Self, T::Expression> {
+    fn cosine_distance<T>(self, other: T) -> CosineDistance<Self, T::Expression>
+    where
+        Self::SqlType: SqlType,
+        T: AsExpression<Self::SqlType>,
+    {
         CosineDistance::new(self, other.as_expression())
     }
 }
@@ -61,7 +73,7 @@ mod tests {
     }
 
     #[derive(Debug, Insertable, PartialEq, Queryable)]
-    #[table_name="items"]
+    #[diesel(table_name = items)]
     struct Item {
         pub id: i32,
         pub factors: Option<crate::Vector>
@@ -74,10 +86,10 @@ mod tests {
         use diesel::pg::PgConnection;
         use diesel::{Connection, QueryDsl, RunQueryDsl};
 
-        let conn = PgConnection::establish("postgres://localhost/pgvector_rust_test").unwrap();
-        conn.execute("CREATE EXTENSION IF NOT EXISTS vector").unwrap();
-        conn.execute("DROP TABLE IF EXISTS items").unwrap();
-        conn.execute("CREATE TABLE items (id serial primary key, factors vector(3))").unwrap();
+        let mut conn = PgConnection::establish("postgres://localhost/pgvector_rust_test").unwrap();
+        diesel::sql_query("CREATE EXTENSION IF NOT EXISTS vector").execute(&mut conn).unwrap();
+        diesel::sql_query("DROP TABLE IF EXISTS items").execute(&mut conn).unwrap();
+        diesel::sql_query("CREATE TABLE items (id serial primary key, factors vector(3))").execute(&mut conn).unwrap();
 
         let new_items = vec![
             Item {
@@ -94,37 +106,37 @@ mod tests {
             },
         ];
 
-        diesel::insert_into(items::table).values(&new_items).get_results::<Item>(&conn).unwrap();
+        diesel::insert_into(items::table).values(&new_items).get_results::<Item>(&mut conn).unwrap();
 
-        let all = items::table.load::<Item>(&conn).unwrap();
+        let all = items::table.load::<Item>(&mut conn).unwrap();
         assert_eq!(3, all.len());
 
         let neighbors = items::table
             .order(items::factors.l2_distance(Vector::from(vec![1.0, 1.0, 1.0])))
             .limit(5)
-            .load::<Item>(&conn)
+            .load::<Item>(&mut conn)
             .unwrap();
         assert_eq!(vec![1, 3, 2], neighbors.into_iter().map(|v| v.id).collect::<Vec<i32>>());
 
         let neighbors = items::table
             .order(items::factors.max_inner_product(Vector::from(vec![1.0, 1.0, 1.0])))
             .limit(5)
-            .load::<Item>(&conn)
+            .load::<Item>(&mut conn)
             .unwrap();
         assert_eq!(vec![2, 3, 1], neighbors.into_iter().map(|v| v.id).collect::<Vec<i32>>());
 
         let neighbors = items::table
             .order(items::factors.cosine_distance(Vector::from(vec![1.0, 1.0, 1.0])))
             .limit(5)
-            .load::<Item>(&conn)
+            .load::<Item>(&mut conn)
             .unwrap();
         assert_eq!(vec![1, 2, 3], neighbors.into_iter().map(|v| v.id).collect::<Vec<i32>>());
 
         let distances = items::table
             .select(items::factors.max_inner_product(Vector::from(vec![1.0, 1.0, 1.0])))
             .order(items::id)
-            .load::<f64>(&conn)
+            .load::<Option<f64>>(&mut conn)
             .unwrap();
-        assert_eq!(vec![-3.0, -6.0, -4.0], distances);
+        assert_eq!(vec![Some(-3.0), Some(-6.0), Some(-4.0)], distances);
     }
 }

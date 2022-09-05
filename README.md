@@ -156,7 +156,7 @@ let new_item = Item {
 
 diesel::insert_into(items::table)
     .values(&new_item)
-    .get_result::<Item>(&conn)?;
+    .get_result::<Item>(&mut conn)?;
 ```
 
 Get the nearest neighbors
@@ -167,7 +167,7 @@ use pgvector::VectorExpressionMethods;
 let neighbors = items::table
     .order(items::factors.l2_distance(factors))
     .limit(5)
-    .load::<Item>(&conn)?;
+    .load::<Item>(&mut conn)?;
 ```
 
 Also supports `max_inner_product` and `cosine_distance`
@@ -177,7 +177,7 @@ Get the distances
 ```rust
 let distances = items::table
     .select(items::factors.l2_distance(factors))
-    .load::<f64>(&conn)?;
+    .load::<Option<f64>>(&mut conn)?;
 ```
 
 Add an approximate index in a migration

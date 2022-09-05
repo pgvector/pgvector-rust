@@ -1,3 +1,8 @@
+## 0.2.0 (unreleased)
+
+- Added support for Diesel 2
+- Dropped support for Diesel 1
+
 ## 0.1.4 (2022-01-12)
 
 - Added `into`
