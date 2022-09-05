@@ -1,4 +1,4 @@
-## 0.2.0 (unreleased)
+## 0.2.0 (2022-09-05)
 
 - Added support for Diesel 2
 - Dropped support for Diesel 1

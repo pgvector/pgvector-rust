@@ -19,7 +19,7 @@ Follow the instructions for your database library:
 Add this line to your application’s `Cargo.toml` under `[dependencies]`:
 
 ```toml
-pgvector = { version = "0.1", features = ["postgres"] }
+pgvector = { version = "0.2", features = ["postgres"] }
 ```
 
 Create a vector from a `Vec<f32>`
@@ -58,7 +58,7 @@ let res: Option<pgvector::Vector> = row.get(0);
 Add this line to your application’s `Cargo.toml` under `[dependencies]`:
 
 ```toml
-pgvector = { version = "0.1", features = ["sqlx"] }
+pgvector = { version = "0.2", features = ["sqlx"] }
 ```
 
 Create a vector from a `Vec<f32>`
@@ -92,7 +92,7 @@ let vec: pgvector::Vector = row.try_get("column")?;
 Add this line to your application’s `Cargo.toml` under `[dependencies]`:
 
 ```toml
-pgvector = { version = "0.1", features = ["diesel"] }
+pgvector = { version = "0.2", features = ["diesel"] }
 ```
 
 And add this line to your application’s `diesel.toml` under `[print_schema]`:
