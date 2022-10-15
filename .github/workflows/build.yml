@@ -4,7 +4,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
@@ -13,7 +13,7 @@ jobs:
         database: pgvector_rust_test
     - run: |
         sudo apt-get update && sudo apt-get install postgresql-server-dev-14
-        git clone --branch v0.2.7 https://github.com/pgvector/pgvector.git
+        git clone --branch v0.3.0 https://github.com/pgvector/pgvector.git
         cd pgvector
         make
         sudo make install
