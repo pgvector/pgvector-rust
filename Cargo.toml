@@ -16,7 +16,7 @@ diesel = { version = "2", features = ["postgres"], optional = true }
 sqlx = { version = "0", features = ["postgres"], optional = true }
 
 [dev-dependencies]
-sqlx = { version = "0", features = [ "runtime-async-std-native-tls" ] }
+sqlx = { version = "0", features = ["runtime-async-std-native-tls"] }
 async-std = { version = "1", features = ["attributes"] }
 
 [features]
