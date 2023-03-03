@@ -25,32 +25,32 @@ pgvector = { version = "0.2", features = ["postgres"] }
 Create a vector from a `Vec<f32>`
 
 ```rust
-let vec = pgvector::Vector::from(vec![1.0, 2.0, 3.0]);
+let embedding = pgvector::Vector::from(vec![1.0, 2.0, 3.0]);
 ```
 
 Insert a vector
 
 ```rust
-client.execute("INSERT INTO items (embedding) VALUES ($1)", &[&vec])?;
+client.execute("INSERT INTO items (embedding) VALUES ($1)", &[&embedding])?;
 ```
 
 Get the nearest neighbor
 
 ```rust
-let row = client.query_one("SELECT * FROM items ORDER BY embedding <-> $1 LIMIT 1", &[&vec])?;
+let row = client.query_one("SELECT * FROM items ORDER BY embedding <-> $1 LIMIT 1", &[&embedding])?;
 ```
 
 Retrieve a vector
 
 ```rust
 let row = client.query_one("SELECT embedding FROM items LIMIT 1", &[])?;
-let vec: pgvector::Vector = row.get(0);
+let embedding: pgvector::Vector = row.get(0);
 ```
 
 Use `Option` if the value could be `NULL`
 
 ```rust
-let res: Option<pgvector::Vector> = row.get(0);
+let embedding: Option<pgvector::Vector> = row.get(0);
 ```
 
 ## SQLx
@@ -64,20 +64,20 @@ pgvector = { version = "0.2", features = ["sqlx"] }
 Create a vector from a `Vec<f32>`
 
 ```rust
-let vec = pgvector::Vector::from(vec![1.0, 2.0, 3.0]);
+let embedding = pgvector::Vector::from(vec![1.0, 2.0, 3.0]);
 ```
 
 Insert a vector
 
 ```rust
-sqlx::query("INSERT INTO items (embedding) VALUES ($1)").bind(vec).execute(&pool).await?;
+sqlx::query("INSERT INTO items (embedding) VALUES ($1)").bind(embedding).execute(&pool).await?;
 ```
 
 Get the nearest neighbors
 
 ```rust
 let rows = sqlx::query("SELECT * FROM items ORDER BY embedding <-> $1 LIMIT 1")
-    .bind(vec).fetch_all(&pool).await?;
+    .bind(embedding).fetch_all(&pool).await?;
 ```
 
 Retrieve a vector
