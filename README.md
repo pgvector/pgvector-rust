@@ -31,19 +31,19 @@ let vec = pgvector::Vector::from(vec![1.0, 2.0, 3.0]);
 Insert a vector
 
 ```rust
-client.execute("INSERT INTO table (column) VALUES ($1)", &[&vec])?;
+client.execute("INSERT INTO items (embedding) VALUES ($1)", &[&vec])?;
 ```
 
 Get the nearest neighbor
 
 ```rust
-let row = client.query_one("SELECT * FROM table ORDER BY column <-> $1 LIMIT 1", &[&vec])?;
+let row = client.query_one("SELECT * FROM items ORDER BY embedding <-> $1 LIMIT 1", &[&vec])?;
 ```
 
 Retrieve a vector
 
 ```rust
-let row = client.query_one("SELECT column FROM table LIMIT 1", &[])?;
+let row = client.query_one("SELECT embedding FROM items LIMIT 1", &[])?;
 let vec: pgvector::Vector = row.get(0);
 ```
 
@@ -70,21 +70,21 @@ let vec = pgvector::Vector::from(vec![1.0, 2.0, 3.0]);
 Insert a vector
 
 ```rust
-sqlx::query("INSERT INTO table (column) VALUES ($1)").bind(vec).execute(&pool).await?;
+sqlx::query("INSERT INTO items (embedding) VALUES ($1)").bind(vec).execute(&pool).await?;
 ```
 
 Get the nearest neighbors
 
 ```rust
-let rows = sqlx::query("SELECT * FROM table ORDER BY column <-> $1 LIMIT 1")
+let rows = sqlx::query("SELECT * FROM items ORDER BY embedding <-> $1 LIMIT 1")
     .bind(vec).fetch_all(&pool).await?;
 ```
 
 Retrieve a vector
 
 ```rust
-let row = sqlx::query("SELECT column FROM table LIMIT 1").fetch_one(&pool).await?;
-let vec: pgvector::Vector = row.try_get("column")?;
+let row = sqlx::query("SELECT embedding FROM items LIMIT 1").fetch_one(&pool).await?;
+let embedding: pgvector::Vector = row.try_get("embedding")?;
 ```
 
 ## Diesel
