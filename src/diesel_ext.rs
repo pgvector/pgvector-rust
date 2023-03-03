@@ -67,7 +67,7 @@ mod tests {
 
         items (id) {
             id -> Int4,
-            factors -> Nullable<crate::sql_types::Vector>,
+            embedding -> Nullable<crate::sql_types::Vector>,
         }
     }
 
@@ -75,7 +75,7 @@ mod tests {
     #[diesel(table_name = items)]
     struct Item {
         pub id: i32,
-        pub factors: Option<crate::Vector>
+        pub embedding: Option<crate::Vector>
     }
 
     #[test]
@@ -88,24 +88,24 @@ mod tests {
         let mut conn = PgConnection::establish("postgres://localhost/pgvector_rust_test").unwrap();
         diesel::sql_query("CREATE EXTENSION IF NOT EXISTS vector").execute(&mut conn).unwrap();
         diesel::sql_query("DROP TABLE IF EXISTS items").execute(&mut conn).unwrap();
-        diesel::sql_query("CREATE TABLE items (id serial primary key, factors vector(3))").execute(&mut conn).unwrap();
+        diesel::sql_query("CREATE TABLE items (id serial primary key, embedding vector(3))").execute(&mut conn).unwrap();
 
         let new_items = vec![
             Item {
                 id: 1,
-                factors: Some(Vector::from(vec![1.0, 1.0, 1.0]))
+                embedding: Some(Vector::from(vec![1.0, 1.0, 1.0]))
             },
             Item {
                 id: 2,
-                factors: Some(Vector::from(vec![2.0, 2.0, 2.0]))
+                embedding: Some(Vector::from(vec![2.0, 2.0, 2.0]))
             },
             Item {
                 id: 3,
-                factors: Some(Vector::from(vec![1.0, 1.0, 2.0]))
+                embedding: Some(Vector::from(vec![1.0, 1.0, 2.0]))
             },
             Item {
                 id: 4,
-                factors: None
+                embedding: None
             },
         ];
 
@@ -115,28 +115,28 @@ mod tests {
         assert_eq!(4, all.len());
 
         let neighbors = items::table
-            .order(items::factors.l2_distance(Vector::from(vec![1.0, 1.0, 1.0])))
+            .order(items::embedding.l2_distance(Vector::from(vec![1.0, 1.0, 1.0])))
             .limit(5)
             .load::<Item>(&mut conn)
             .unwrap();
         assert_eq!(vec![1, 3, 2, 4], neighbors.into_iter().map(|v| v.id).collect::<Vec<i32>>());
 
         let neighbors = items::table
-            .order(items::factors.max_inner_product(Vector::from(vec![1.0, 1.0, 1.0])))
+            .order(items::embedding.max_inner_product(Vector::from(vec![1.0, 1.0, 1.0])))
             .limit(5)
             .load::<Item>(&mut conn)
             .unwrap();
         assert_eq!(vec![2, 3, 1, 4], neighbors.into_iter().map(|v| v.id).collect::<Vec<i32>>());
 
         let neighbors = items::table
-            .order(items::factors.cosine_distance(Vector::from(vec![1.0, 1.0, 1.0])))
+            .order(items::embedding.cosine_distance(Vector::from(vec![1.0, 1.0, 1.0])))
             .limit(5)
             .load::<Item>(&mut conn)
             .unwrap();
         assert_eq!(vec![1, 2, 3, 4], neighbors.into_iter().map(|v| v.id).collect::<Vec<i32>>());
 
         let distances = items::table
-            .select(items::factors.max_inner_product(Vector::from(vec![1.0, 1.0, 1.0])))
+            .select(items::embedding.max_inner_product(Vector::from(vec![1.0, 1.0, 1.0])))
             .order(items::id)
             .load::<Option<f64>>(&mut conn)
             .unwrap();

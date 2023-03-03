@@ -129,7 +129,7 @@ You can now use the `vector` type in future migrations
 
 ```sql
 CREATE TABLE items (
-  factors VECTOR(3)
+  embedding VECTOR(3)
 )
 ```
 
@@ -137,21 +137,21 @@ For models, use:
 
 ```rust
 pub struct Item {
-    pub factors: Option<pgvector::Vector>
+    pub embedding: Option<pgvector::Vector>
 }
 ```
 
 Create a vector from a `Vec<f32>`
 
 ```rust
-let factors = pgvector::Vector::from(vec![1.0, 2.0, 3.0]);
+let embedding = pgvector::Vector::from(vec![1.0, 2.0, 3.0]);
 ```
 
 Insert a vector
 
 ```rust
 let new_item = Item {
-    factors: Some(factors)
+    embedding: Some(embedding)
 };
 
 diesel::insert_into(items::table)
@@ -165,7 +165,7 @@ Get the nearest neighbors
 use pgvector::VectorExpressionMethods;
 
 let neighbors = items::table
-    .order(items::factors.l2_distance(factors))
+    .order(items::embedding.l2_distance(embedding))
     .limit(5)
     .load::<Item>(&mut conn)?;
 ```
@@ -176,14 +176,14 @@ Get the distances
 
 ```rust
 let distances = items::table
-    .select(items::factors.l2_distance(factors))
+    .select(items::embedding.l2_distance(embedding))
     .load::<Option<f64>>(&mut conn)?;
 ```
 
 Add an approximate index in a migration
 
 ```sql
-CREATE INDEX my_index ON items USING ivfflat (factors vector_l2_ops)
+CREATE INDEX my_index ON items USING ivfflat (embedding vector_l2_ops)
 ```
 
 Use `vector_ip_ops` for inner product and `vector_cosine_ops` for cosine distance
