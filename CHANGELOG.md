@@ -1,4 +1,4 @@
-## 0.2.1 (unreleased)
+## 0.2.1 (2023-05-23)
 
 - Added support for `vector[]` type with SQLx
 
