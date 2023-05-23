@@ -1,7 +1,7 @@
 use bytes::BytesMut;
 use sqlx::encode::IsNull;
 use sqlx::error::BoxDynError;
-use sqlx::postgres::{PgArgumentBuffer, PgTypeInfo, PgValueRef};
+use sqlx::postgres::{PgArgumentBuffer, PgHasArrayType, PgTypeInfo, PgValueRef};
 use sqlx::{Decode, Encode, Postgres, Type};
 
 use crate::Vector;
@@ -25,6 +25,12 @@ impl Decode<'_, Postgres> for Vector {
     fn decode(value: PgValueRef<'_>) -> Result<Self, BoxDynError> {
         let buf = <&[u8] as Decode<Postgres>>::decode(value)?;
         Vector::from_sql(buf)
+    }
+}
+
+impl PgHasArrayType for Vector {
+    fn array_type_info() -> PgTypeInfo {
+        PgTypeInfo::with_name("_vector")
     }
 }
 
@@ -67,6 +73,11 @@ mod tests {
         let text_row = sqlx::query("SELECT c::text from t2 ORDER BY id LIMIT 1").fetch_one(&pool).await?;
         let text_res: String = text_row.try_get("c").unwrap();
         assert_eq!("[1,2,3]", text_res);
+
+        let vecs = vec![vec, vec2];
+        sqlx::query("DROP TABLE IF EXISTS t3").execute(&pool).await?;
+        sqlx::query("CREATE TABLE t3 (id bigserial primary key, c vector[])").execute(&pool).await?;
+        sqlx::query("INSERT INTO t3 (c) VALUES ($1)").bind(&vecs).execute(&pool).await?;
 
         Ok(())
     }

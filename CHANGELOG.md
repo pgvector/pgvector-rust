@@ -1,3 +1,7 @@
+## 0.2.1 (unreleased)
+
+- Added support for `vector[]` type with SQLx
+
 ## 0.2.0 (2022-09-05)
 
 - Added support for Diesel 2
