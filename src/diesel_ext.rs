@@ -88,7 +88,7 @@ mod tests {
         let mut conn = PgConnection::establish("postgres://localhost/pgvector_rust_test").unwrap();
         diesel::sql_query("CREATE EXTENSION IF NOT EXISTS vector").execute(&mut conn).unwrap();
         diesel::sql_query("DROP TABLE IF EXISTS items").execute(&mut conn).unwrap();
-        diesel::sql_query("CREATE TABLE items (id serial primary key, embedding vector(3))").execute(&mut conn).unwrap();
+        diesel::sql_query("CREATE TABLE items (id serial PRIMARY KEY, embedding vector(3))").execute(&mut conn).unwrap();
 
         let new_items = vec![
             Item {
