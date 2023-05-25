@@ -7,7 +7,7 @@ use std::error::Error;
 #[cfg(feature = "diesel")]
 use crate::diesel_ext::VectorType;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "diesel", derive(FromSqlRow, AsExpression))]
 #[cfg_attr(feature = "diesel", diesel(sql_type = VectorType))]
 pub struct Vector(Vec<f32>);

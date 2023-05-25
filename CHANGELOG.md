@@ -1,3 +1,7 @@
+## 0.2.2 (unreleased)
+
+- Added `Clone` trait to `Vector`
+
 ## 0.2.1 (2023-05-23)
 
 - Added support for `vector[]` type with SQLx
