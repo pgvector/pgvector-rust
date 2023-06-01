@@ -1,8 +1,7 @@
 use bytes::BytesMut;
-use diesel::backend;
 use diesel::deserialize::{self, FromSql};
 use diesel::expression::{AsExpression, Expression};
-use diesel::pg::Pg;
+use diesel::pg::{Pg, PgValue};
 use diesel::serialize::{self, IsNull, Output, ToSql};
 use diesel::sql_types::{Double, Nullable, SqlType};
 use std::io::Write;
@@ -23,7 +22,7 @@ impl ToSql<VectorType, Pg> for Vector {
 }
 
 impl FromSql<VectorType, Pg> for Vector {
-    fn from_sql(value: backend::RawValue<'_, Pg>) -> deserialize::Result<Self> {
+    fn from_sql(value: PgValue<'_>) -> deserialize::Result<Self> {
         Vector::from_sql(value.as_bytes())
     }
 }
