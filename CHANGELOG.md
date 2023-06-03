@@ -1,4 +1,4 @@
-## 0.2.2 (unreleased)
+## 0.2.2 (2023-06-02)
 
 - Added `Clone` trait to `Vector`
 - Fixed deprecation warning with Diesel 2.1
