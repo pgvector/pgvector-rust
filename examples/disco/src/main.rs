@@ -11,8 +11,12 @@ fn main() {
     // https://grouplens.org/datasets/movielens/100k/
     let movielens_path = std::env::var("MOVIELENS_100K_PATH").expect("Set MOVIELENS_100K_PATH");
 
-    let user = std::env::var("USER").unwrap();
-    let mut client = Client::configure().host("localhost").dbname("pgvector_rust_test").user(user.as_str()).connect(NoTls).unwrap();
+    let mut client = Client::configure()
+        .host("localhost")
+        .dbname("pgvector_rust_test")
+        .user(std::env::var("USER").unwrap().as_str())
+        .connect(NoTls)
+        .unwrap();
 
     client.execute("CREATE EXTENSION IF NOT EXISTS vector", &[]).unwrap();
     client.execute("DROP TABLE IF EXISTS users", &[]).unwrap();
