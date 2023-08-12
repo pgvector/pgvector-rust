@@ -1,0 +1,11 @@
+[package]
+name = "example"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+csv = "1"
+discorec = "0.1"
+pgvector = { path = "../..", features = ["postgres"] }
+postgres = "0.19"
