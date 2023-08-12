@@ -36,7 +36,7 @@ fn main() {
 
     let movie = "Star Wars (1977)";
     println!("Item-based recommendations for {}", movie);
-    for row in client.query("SELECT name FROM movies WHERE name != $1 ORDER BY factors <-> (SELECT factors FROM movies WHERE name = $1) LIMIT 5", &[&movie]).unwrap() {
+    for row in client.query("SELECT name FROM movies WHERE name != $1 ORDER BY factors <=> (SELECT factors FROM movies WHERE name = $1) LIMIT 5", &[&movie]).unwrap() {
         let name: &str = row.get(0);
         println!("- {}", name);
     }
