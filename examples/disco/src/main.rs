@@ -1,8 +1,7 @@
 use csv::ReaderBuilder;
 use discorec::{Dataset, RecommenderBuilder};
 use pgvector::Vector;
-use postgres::config::Config;
-use postgres::NoTls;
+use postgres::{Client, NoTls};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
@@ -13,7 +12,7 @@ fn main() {
     let movielens_path = std::env::var("MOVIELENS_100K_PATH").expect("Set MOVIELENS_100K_PATH");
 
     let user = std::env::var("USER").unwrap();
-    let mut client = Config::new().host("localhost").dbname("pgvector_rust_test").user(user.as_str()).connect(NoTls).unwrap();
+    let mut client = Client::configure().host("localhost").dbname("pgvector_rust_test").user(user.as_str()).connect(NoTls).unwrap();
 
     client.execute("CREATE EXTENSION IF NOT EXISTS vector", &[]).unwrap();
     client.execute("DROP TABLE IF EXISTS users", &[]).unwrap();

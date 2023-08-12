@@ -32,11 +32,10 @@ mod tests {
     #[test]
     fn it_works() {
         use crate::Vector;
-        use postgres::config::Config;
-        use postgres::NoTls;
+        use postgres::{Client, NoTls};
 
         let user = std::env::var("USER").unwrap();
-        let mut client = Config::new().host("localhost").dbname("pgvector_rust_test").user(user.as_str()).connect(NoTls).unwrap();
+        let mut client = Client::configure().host("localhost").dbname("pgvector_rust_test").user(user.as_str()).connect(NoTls).unwrap();
 
         client.execute("CREATE EXTENSION IF NOT EXISTS vector", &[]).unwrap();
         client.execute("DROP TABLE IF EXISTS postgres_items", &[]).unwrap();
