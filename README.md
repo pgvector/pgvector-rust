@@ -14,6 +14,10 @@ Follow the instructions for your database library:
 - [SQLx](#sqlx)
 - [Diesel](#diesel)
 
+Or check out an example:
+
+- [Recommendations](examples/disco/src/main.rs) with Disco
+
 ## Rust-Postgres
 
 Add this line to your application’s `Cargo.toml` under `[dependencies]`:
