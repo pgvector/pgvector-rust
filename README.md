@@ -14,8 +14,9 @@ Follow the instructions for your database library:
 - [SQLx](#sqlx)
 - [Diesel](#diesel)
 
-Or check out an example:
+Or check out some examples:
 
+- [Embeddings](examples/openai/src/main.rs) with OpenAI
 - [Recommendations](examples/disco/src/main.rs) with Disco
 
 ## Rust-Postgres
