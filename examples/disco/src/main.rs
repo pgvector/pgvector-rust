@@ -14,7 +14,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let mut client = Client::configure()
         .host("localhost")
-        .dbname("pgvector_rust_test")
+        .dbname("pgvector_example")
         .user(std::env::var("USER")?.as_str())
         .connect(NoTls)?;
 

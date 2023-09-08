@@ -6,13 +6,13 @@ use std::error::Error;
 fn main() -> Result<(), Box<dyn Error>> {
     let mut client = Client::configure()
         .host("localhost")
-        .dbname("pgvector_rust_test")
+        .dbname("pgvector_example")
         .user(std::env::var("USER")?.as_str())
         .connect(NoTls)?;
 
     client.execute("CREATE EXTENSION IF NOT EXISTS vector", &[])?;
-    client.execute("DROP TABLE IF EXISTS articles", &[])?;
-    client.execute("CREATE TABLE articles (id serial PRIMARY KEY, content text, embedding vector(1536))", &[])?;
+    client.execute("DROP TABLE IF EXISTS documents", &[])?;
+    client.execute("CREATE TABLE documents (id serial PRIMARY KEY, content text, embedding vector(1536))", &[])?;
 
     let input = [
         "The dog is barking",
@@ -23,11 +23,11 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     for (content, embedding) in input.iter().zip(embeddings) {
         let embedding = Vector::from(embedding);
-        client.execute("INSERT INTO articles (content, embedding) VALUES ($1, $2)", &[&content, &embedding])?;
+        client.execute("INSERT INTO documents (content, embedding) VALUES ($1, $2)", &[&content, &embedding])?;
     }
 
-    let article_id = 2;
-    for row in client.query("SELECT content FROM articles WHERE id != $1 ORDER BY embedding <=> (SELECT embedding FROM articles WHERE id = $1) LIMIT 5", &[&article_id])? {
+    let document_id = 2;
+    for row in client.query("SELECT content FROM documents WHERE id != $1 ORDER BY embedding <=> (SELECT embedding FROM documents WHERE id = $1) LIMIT 5", &[&document_id])? {
         let content: &str = row.get(0);
         println!("{}", content);
     }
