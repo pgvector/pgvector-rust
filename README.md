@@ -27,6 +27,18 @@ Add this line to your application’s `Cargo.toml` under `[dependencies]`:
 pgvector = { version = "0.2", features = ["postgres"] }
 ```
 
+Enable the extension
+
+```rust
+client.execute("CREATE EXTENSION IF NOT EXISTS vector", &[])?;
+```
+
+Create a table
+
+```rust
+client.execute("CREATE TABLE items (id bigserial PRIMARY KEY, embedding vector(3))", &[])?;
+```
+
 Create a vector from a `Vec<f32>`
 
 ```rust
@@ -64,6 +76,18 @@ Add this line to your application’s `Cargo.toml` under `[dependencies]`:
 
 ```toml
 pgvector = { version = "0.2", features = ["sqlx"] }
+```
+
+Enable the extension
+
+```rust
+sqlx::query("CREATE EXTENSION IF NOT EXISTS vector").execute(&pool).await?;
+```
+
+Create a table
+
+```rust
+sqlx::query("CREATE TABLE items (id bigserial PRIMARY KEY, embedding vector(3))").execute(&pool).await?;
 ```
 
 Create a vector from a `Vec<f32>`
