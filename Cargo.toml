@@ -13,10 +13,10 @@ byteorder = "1"
 bytes = "1"
 postgres = { version = "0.19", optional = true }
 diesel = { version = "2", features = ["postgres"], optional = true }
-sqlx = { version = ">= 0.5, < 0.8", features = ["postgres"], optional = true }
+sqlx = { version = ">= 0.5, < 0.8", default-features = false, features = ["postgres"], optional = true }
 
 [dev-dependencies]
-sqlx = { version = "0", features = ["runtime-async-std-native-tls"] }
+sqlx = { version = "0", default-features = false, features = ["runtime-async-std-native-tls"] }
 async-std = { version = "1", features = ["attributes"] }
 
 [features]
