@@ -1,3 +1,7 @@
+## 0.2.3 (unreleased)
+
+- Removed unnecessary features of dependencies
+
 ## 0.2.2 (2023-06-02)
 
 - Added `Clone` trait to `Vector`
