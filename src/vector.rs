@@ -1,4 +1,3 @@
-use byteorder::{BigEndian, ReadBytesExt};
 use bytes::{BufMut, BytesMut};
 use std::cmp::PartialEq;
 use std::convert::TryInto;
@@ -29,15 +28,18 @@ impl Vector {
         self.0.clone()
     }
 
-    pub(crate) fn from_sql(mut buf: &[u8]) -> Result<Vector, Box<dyn Error + Sync + Send>> {
-        let dim = buf.read_u16::<BigEndian>()?;
-        let unused = buf.read_u16::<BigEndian>()?;
+    pub(crate) fn from_sql(buf: &[u8]) -> Result<Vector, Box<dyn Error + Sync + Send>> {
+        let dim = u16::from_be_bytes(buf[0..2].try_into()?) as usize;
+        let unused = u16::from_be_bytes(buf[2..4].try_into()?);
         if unused != 0 {
             return Err("expected unused to be 0".into());
         }
 
-        let mut vec = vec![0.0; dim as usize];
-        buf.read_f32_into::<BigEndian>(&mut vec)?;
+        let mut vec = Vec::with_capacity(dim);
+        for i in 0..dim {
+            let s = 4 + 4 * i;
+            vec.push(f32::from_be_bytes(buf[s..s + 4].try_into()?));
+        }
 
         Ok(Vector(vec))
     }
