@@ -21,7 +21,7 @@ impl ToSql for Vector {
         w.put_u16(dim.try_into()?);
         w.put_u16(0);
 
-        for v in self.0.iter() {
+        for v in &self.0 {
             w.put_f32(*v);
         }
 
