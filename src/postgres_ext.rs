@@ -1,5 +1,6 @@
-use bytes::BytesMut;
+use bytes::{BufMut, BytesMut};
 use postgres::types::{to_sql_checked, FromSql, IsNull, ToSql, Type};
+use std::convert::TryInto;
 use std::error::Error;
 
 use crate::Vector;
@@ -16,7 +17,14 @@ impl<'a> FromSql<'a> for Vector {
 
 impl ToSql for Vector {
     fn to_sql(&self, _ty: &Type, w: &mut BytesMut) -> Result<IsNull, Box<dyn Error + Sync + Send>> {
-        self.to_sql(w)?;
+        let dim = self.0.len();
+        w.put_u16(dim.try_into()?);
+        w.put_u16(0);
+
+        for v in self.0.iter() {
+            w.put_f32(*v);
+        }
+
         Ok(IsNull::No)
     }
 

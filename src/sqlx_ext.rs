@@ -1,8 +1,8 @@
-use bytes::BytesMut;
 use sqlx::encode::IsNull;
 use sqlx::error::BoxDynError;
 use sqlx::postgres::{PgArgumentBuffer, PgHasArrayType, PgTypeInfo, PgValueRef};
 use sqlx::{Decode, Encode, Postgres, Type};
+use std::convert::TryFrom;
 
 use crate::Vector;
 
@@ -14,9 +14,14 @@ impl Type<Postgres> for Vector {
 
 impl Encode<'_, Postgres> for Vector {
     fn encode_by_ref(&self, buf: &mut PgArgumentBuffer) -> IsNull {
-        let mut w = BytesMut::new();
-        self.to_sql(&mut w).unwrap();
-        buf.extend(&w[..]);
+        let dim = self.0.len();
+        buf.extend(&u16::try_from(dim).unwrap().to_be_bytes());
+        buf.extend(&0_u16.to_be_bytes());
+
+        for v in &self.0 {
+            buf.extend(&v.to_be_bytes());
+        }
+
         IsNull::No
     }
 }

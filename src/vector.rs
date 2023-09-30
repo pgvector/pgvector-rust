@@ -1,4 +1,3 @@
-use bytes::{BufMut, BytesMut};
 use std::cmp::PartialEq;
 use std::convert::TryInto;
 use std::error::Error;
@@ -9,7 +8,7 @@ use crate::diesel_ext::VectorType;
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "diesel", derive(FromSqlRow, AsExpression))]
 #[cfg_attr(feature = "diesel", diesel(sql_type = VectorType))]
-pub struct Vector(Vec<f32>);
+pub struct Vector(pub(crate) Vec<f32>);
 
 impl From<Vec<f32>> for Vector {
     fn from(v: Vec<f32>) -> Self {
@@ -42,18 +41,6 @@ impl Vector {
         }
 
         Ok(Vector(vec))
-    }
-
-    pub(crate) fn to_sql(&self, w: &mut BytesMut) -> Result<(), Box<dyn Error + Sync + Send>> {
-        let dim = self.0.len();
-        w.put_u16(dim.try_into()?);
-        w.put_u16(0);
-
-        for v in self.0.iter() {
-            w.put_f32(*v);
-        }
-
-        Ok(())
     }
 }
 

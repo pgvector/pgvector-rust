@@ -1,9 +1,9 @@
-use bytes::BytesMut;
 use diesel::deserialize::{self, FromSql};
 use diesel::expression::{AsExpression, Expression};
 use diesel::pg::{Pg, PgValue};
 use diesel::serialize::{self, IsNull, Output, ToSql};
 use diesel::sql_types::{Double, Nullable, SqlType};
+use std::convert::TryFrom;
 use std::io::Write;
 
 use crate::Vector;
@@ -14,9 +14,14 @@ pub struct VectorType;
 
 impl ToSql<VectorType, Pg> for Vector {
     fn to_sql<'b>(&'b self, out: &mut Output<'b, '_, Pg>) -> serialize::Result {
-        let mut w = BytesMut::new();
-        self.to_sql(&mut w)?;
-        out.write_all(&w)?;
+        let dim = self.0.len();
+        out.write_all(&u16::try_from(dim)?.to_be_bytes())?;
+        out.write_all(&0_u16.to_be_bytes())?;
+
+        for v in &self.0 {
+            out.write_all(&v.to_be_bytes())?;
+        }
+
         Ok(IsNull::No)
     }
 }
