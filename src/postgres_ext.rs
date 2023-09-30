@@ -47,8 +47,7 @@ mod tests {
             .host("localhost")
             .dbname("pgvector_rust_test")
             .user(user.as_str())
-            .connect(NoTls)
-            .unwrap();
+            .connect(NoTls)?;
 
         client.execute("CREATE EXTENSION IF NOT EXISTS vector", &[])?;
         client.execute("DROP TABLE IF EXISTS postgres_items", &[])?;
