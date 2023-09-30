@@ -1,8 +1,8 @@
 ## 0.3.0 (unreleased)
 
-- Updated Rust edition to 2021
-- Removed unnecessary features of dependencies
 - Removed `postgres` from default features
+- Reduced dependencies
+- Updated Rust edition to 2021
 
 ## 0.2.2 (2023-06-02)
 
