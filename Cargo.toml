@@ -6,7 +6,7 @@ repository = "https://github.com/pgvector/pgvector-rust"
 license = "MIT OR Apache-2.0"
 authors = ["Andrew Kane <andrew@ankane.org>"]
 edition = "2018"
-rust-version = "1.32.0"
+rust-version = "1.56.0"
 readme = "README.md"
 
 [dependencies]

@@ -16,9 +16,9 @@ impl From<Vec<f32>> for Vector {
     }
 }
 
-impl Into<Vec<f32>> for Vector {
-    fn into(self) -> Vec<f32> {
-        self.0
+impl From<Vector> for Vec<f32> {
+    fn from(val: Vector) -> Self {
+        val.0
     }
 }
 
