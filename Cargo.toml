@@ -5,7 +5,7 @@ description = "pgvector support for Rust"
 repository = "https://github.com/pgvector/pgvector-rust"
 license = "MIT OR Apache-2.0"
 authors = ["Andrew Kane <andrew@ankane.org>"]
-edition = "2018"
+edition = "2021"
 rust-version = "1.56.0"
 readme = "README.md"
 
