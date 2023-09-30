@@ -6,6 +6,7 @@ use std::convert::TryInto;
 #[cfg(feature = "diesel")]
 use crate::diesel_ext::VectorType;
 
+/// A vector.
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "diesel", derive(FromSqlRow, AsExpression))]
 #[cfg_attr(feature = "diesel", diesel(sql_type = VectorType))]
@@ -24,6 +25,7 @@ impl From<Vector> for Vec<f32> {
 }
 
 impl Vector {
+    /// Returns a copy of the vector as a `Vec<f32>`.
     pub fn to_vec(&self) -> Vec<f32> {
         self.0.clone()
     }
