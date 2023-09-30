@@ -66,6 +66,10 @@ impl<T: Expression> VectorExpressionMethods for T {}
 
 #[cfg(test)]
 mod tests {
+    use crate::{Vector, VectorExpressionMethods};
+    use diesel::pg::PgConnection;
+    use diesel::{Connection, QueryDsl, RunQueryDsl};
+
     table! {
         use diesel::sql_types::*;
 
@@ -84,11 +88,6 @@ mod tests {
 
     #[test]
     fn it_works() -> Result<(), diesel::result::Error> {
-        use crate::Vector;
-        use crate::VectorExpressionMethods;
-        use diesel::pg::PgConnection;
-        use diesel::{Connection, QueryDsl, RunQueryDsl};
-
         let mut conn = PgConnection::establish("postgres://localhost/pgvector_rust_test").unwrap();
         diesel::sql_query("CREATE EXTENSION IF NOT EXISTS vector").execute(&mut conn)?;
         diesel::sql_query("DROP TABLE IF EXISTS items").execute(&mut conn)?;

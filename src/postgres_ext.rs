@@ -37,11 +37,11 @@ impl ToSql for Vector {
 
 #[cfg(test)]
 mod tests {
+    use crate::Vector;
+    use postgres::{Client, NoTls};
+
     #[test]
     fn it_works() -> Result<(), postgres::Error> {
-        use crate::Vector;
-        use postgres::{Client, NoTls};
-
         let user = std::env::var("USER").unwrap();
         let mut client = Client::configure()
             .host("localhost")

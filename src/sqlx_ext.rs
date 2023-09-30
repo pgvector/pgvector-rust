@@ -41,12 +41,12 @@ impl PgHasArrayType for Vector {
 
 #[cfg(test)]
 mod tests {
+    use crate::Vector;
+    use sqlx::postgres::PgPoolOptions;
+    use sqlx::Row;
+
     #[async_std::test]
     async fn it_works() -> Result<(), sqlx::Error> {
-        use crate::Vector;
-        use sqlx::postgres::PgPoolOptions;
-        use sqlx::Row;
-
         let pool = PgPoolOptions::new()
             .max_connections(1)
             .connect("postgres://localhost/pgvector_rust_test")
