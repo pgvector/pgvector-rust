@@ -44,39 +44,69 @@ mod tests {
 
         let pool = PgPoolOptions::new()
             .max_connections(1)
-            .connect("postgres://localhost/pgvector_rust_test").await?;
+            .connect("postgres://localhost/pgvector_rust_test")
+            .await?;
 
-        sqlx::query("CREATE EXTENSION IF NOT EXISTS vector").execute(&pool).await?;
-        sqlx::query("DROP TABLE IF EXISTS sqlx_items").execute(&pool).await?;
-        sqlx::query("CREATE TABLE sqlx_items (id bigserial PRIMARY KEY, embedding vector(3))").execute(&pool).await?;
+        sqlx::query("CREATE EXTENSION IF NOT EXISTS vector")
+            .execute(&pool)
+            .await?;
+        sqlx::query("DROP TABLE IF EXISTS sqlx_items")
+            .execute(&pool)
+            .await?;
+        sqlx::query("CREATE TABLE sqlx_items (id bigserial PRIMARY KEY, embedding vector(3))")
+            .execute(&pool)
+            .await?;
 
         let vec = Vector::from(vec![1.0, 2.0, 3.0]);
         let vec2 = Vector::from(vec![4.0, 5.0, 6.0]);
-        sqlx::query("INSERT INTO sqlx_items (embedding) VALUES ($1), ($2), (NULL)").bind(&vec).bind(&vec2).execute(&pool).await?;
+        sqlx::query("INSERT INTO sqlx_items (embedding) VALUES ($1), ($2), (NULL)")
+            .bind(&vec)
+            .bind(&vec2)
+            .execute(&pool)
+            .await?;
 
         let query_vec = Vector::from(vec![3.0, 1.0, 2.0]);
-        let row = sqlx::query("SELECT embedding FROM sqlx_items ORDER BY embedding <-> $1 LIMIT 1").bind(query_vec).fetch_one(&pool).await?;
+        let row = sqlx::query("SELECT embedding FROM sqlx_items ORDER BY embedding <-> $1 LIMIT 1")
+            .bind(query_vec)
+            .fetch_one(&pool)
+            .await?;
         let res_vec: Vector = row.try_get("embedding").unwrap();
         assert_eq!(vec, res_vec);
         assert_eq!(vec![1.0, 2.0, 3.0], res_vec.to_vec());
 
         let empty_vec = Vector::from(vec![]);
-        let empty_res = sqlx::query("INSERT INTO sqlx_items (embedding) VALUES ($1)").bind(&empty_vec).execute(&pool).await;
+        let empty_res = sqlx::query("INSERT INTO sqlx_items (embedding) VALUES ($1)")
+            .bind(&empty_vec)
+            .execute(&pool)
+            .await;
         assert!(empty_res.is_err());
-        assert!(empty_res.unwrap_err().to_string().contains("vector must have at least 1 dimension"));
+        assert!(empty_res
+            .unwrap_err()
+            .to_string()
+            .contains("vector must have at least 1 dimension"));
 
-        let null_row = sqlx::query("SELECT embedding FROM sqlx_items WHERE embedding IS NULL LIMIT 1").fetch_one(&pool).await?;
+        let null_row =
+            sqlx::query("SELECT embedding FROM sqlx_items WHERE embedding IS NULL LIMIT 1")
+                .fetch_one(&pool)
+                .await?;
         let null_res: Option<Vector> = null_row.try_get("embedding").unwrap();
         assert!(null_res.is_none());
 
         // ensures binary format is correct
-        let text_row = sqlx::query("SELECT embedding::text FROM sqlx_items ORDER BY id LIMIT 1").fetch_one(&pool).await?;
+        let text_row = sqlx::query("SELECT embedding::text FROM sqlx_items ORDER BY id LIMIT 1")
+            .fetch_one(&pool)
+            .await?;
         let text_res: String = text_row.try_get("embedding").unwrap();
         assert_eq!("[1,2,3]", text_res);
 
         let vecs = vec![vec, vec2];
-        sqlx::query("ALTER TABLE sqlx_items ADD COLUMN factors vector[]").execute(&pool).await?;
-        sqlx::query("INSERT INTO sqlx_items (factors) VALUES ($1)").bind(&vecs).execute(&pool).await?;
+        sqlx::query("ALTER TABLE sqlx_items ADD COLUMN factors vector[]")
+            .execute(&pool)
+            .await?;
+        sqlx::query("INSERT INTO sqlx_items (factors) VALUES ($1)")
+            .bind(&vecs)
+            .execute(&pool)
+            .await?;
 
         Ok(())
     }
