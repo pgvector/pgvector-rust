@@ -19,6 +19,3 @@ sqlx = { version = ">= 0.5, < 0.8", default-features = false, features = ["postg
 diesel = { version = "2", features = ["32-column-tables"] }
 sqlx = { version = "0", default-features = false, features = ["runtime-async-std-native-tls"] }
 async-std = { version = "1", features = ["attributes"] }
-
-[features]
-default = ["postgres"]

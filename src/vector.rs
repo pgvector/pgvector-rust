@@ -1,6 +1,4 @@
 use std::cmp::PartialEq;
-use std::convert::TryInto;
-use std::error::Error;
 
 #[cfg(feature = "diesel")]
 use crate::diesel_ext::VectorType;
@@ -27,7 +25,10 @@ impl Vector {
         self.0.clone()
     }
 
-    pub(crate) fn from_sql(buf: &[u8]) -> Result<Vector, Box<dyn Error + Sync + Send>> {
+    #[cfg(any(feature = "postgres", feature = "sqlx", feature = "diesel"))]
+    pub(crate) fn from_sql(buf: &[u8]) -> Result<Vector, Box<dyn std::error::Error + Sync + Send>> {
+        use std::convert::TryInto;
+
         let dim = u16::from_be_bytes(buf[0..2].try_into()?) as usize;
         let unused = u16::from_be_bytes(buf[2..4].try_into()?);
         if unused != 0 {

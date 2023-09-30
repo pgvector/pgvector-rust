@@ -1,6 +1,7 @@
-## 0.2.3 (unreleased)
+## 0.3.0 (unreleased)
 
 - Removed unnecessary features of dependencies
+- Removed `postgres` from default features
 
 ## 0.2.2 (2023-06-02)
 
