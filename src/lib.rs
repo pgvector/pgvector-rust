@@ -1,6 +1,4 @@
-//! pgvector support for Rust
-//!
-//! [View the docs](https://github.com/pgvector/pgvector-rust)
+#![doc = include_str!("../README.md")]
 
 #[cfg(feature = "diesel")]
 #[macro_use]
