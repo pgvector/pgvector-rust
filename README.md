@@ -16,8 +16,8 @@ Follow the instructions for your database library:
 
 Or check out some examples:
 
-- [Embeddings](examples/openai/src/main.rs) with OpenAI
-- [Recommendations](examples/disco/src/main.rs) with Disco
+- [Embeddings](https://github.com/pgvector/pgvector-rust/blob/master/examples/openai/src/main.rs) with OpenAI
+- [Recommendations](https://github.com/pgvector/pgvector-rust/blob/master/examples/disco/src/main.rs) with Disco
 
 ## Rust-Postgres
 
