@@ -56,7 +56,10 @@ client.execute("INSERT INTO items (embedding) VALUES ($1)", &[&embedding])?;
 Get the nearest neighbor
 
 ```rust
-let row = client.query_one("SELECT * FROM items ORDER BY embedding <-> $1 LIMIT 1", &[&embedding])?;
+let row = client.query_one(
+    "SELECT * FROM items ORDER BY embedding <-> $1 LIMIT 1",
+    &[&embedding],
+)?;
 ```
 
 Retrieve a vector
@@ -83,13 +86,17 @@ pgvector = { version = "0.2", features = ["sqlx"] }
 Enable the extension
 
 ```rust
-sqlx::query("CREATE EXTENSION IF NOT EXISTS vector").execute(&pool).await?;
+sqlx::query("CREATE EXTENSION IF NOT EXISTS vector")
+    .execute(&pool)
+    .await?;
 ```
 
 Create a table
 
 ```rust
-sqlx::query("CREATE TABLE items (id bigserial PRIMARY KEY, embedding vector(3))").execute(&pool).await?;
+sqlx::query("CREATE TABLE items (id bigserial PRIMARY KEY, embedding vector(3))")
+    .execute(&pool)
+    .await?;
 ```
 
 Create a vector from a `Vec<f32>`
@@ -103,7 +110,10 @@ let embedding = Vector::from(vec![1.0, 2.0, 3.0]);
 Insert a vector
 
 ```rust
-sqlx::query("INSERT INTO items (embedding) VALUES ($1)").bind(embedding).execute(&pool).await?;
+sqlx::query("INSERT INTO items (embedding) VALUES ($1)")
+    .bind(embedding)
+    .execute(&pool)
+    .await?;
 ```
 
 Get the nearest neighbors
