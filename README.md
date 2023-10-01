@@ -184,11 +184,15 @@ For models, use:
 ```rust
 use pgvector::Vector;
 
+#[derive(Queryable)]
+#[diesel(table_name = items)]
 pub struct Item {
     pub id: i32,
     pub embedding: Option<Vector>,
 }
 
+#[derive(Insertable)]
+#[diesel(table_name = items)]
 pub struct NewItem {
     pub embedding: Option<Vector>,
 }

@@ -79,14 +79,14 @@ mod tests {
         }
     }
 
-    #[derive(Debug, PartialEq, Queryable)]
+    #[derive(PartialEq, Queryable)]
     #[diesel(table_name = items)]
     struct Item {
         pub id: i32,
         pub embedding: Option<crate::Vector>,
     }
 
-    #[derive(Debug, Insertable)]
+    #[derive(Insertable)]
     #[diesel(table_name = items)]
     struct NewItem {
         pub embedding: Option<crate::Vector>,
