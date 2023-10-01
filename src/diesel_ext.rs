@@ -82,14 +82,14 @@ mod tests {
     use diesel_items as items;
 
     #[derive(Queryable)]
-    #[diesel(table_name = diesel_items)]
+    #[diesel(table_name = items)]
     struct Item {
         pub id: i32,
         pub embedding: Option<Vector>,
     }
 
     #[derive(Insertable)]
-    #[diesel(table_name = diesel_items)]
+    #[diesel(table_name = items)]
     struct NewItem {
         pub embedding: Option<Vector>,
     }
