@@ -79,10 +79,16 @@ mod tests {
         }
     }
 
-    #[derive(Debug, Insertable, PartialEq, Queryable)]
+    #[derive(Debug, PartialEq, Queryable)]
     #[diesel(table_name = items)]
     struct Item {
         pub id: i32,
+        pub embedding: Option<crate::Vector>,
+    }
+
+    #[derive(Debug, Insertable)]
+    #[diesel(table_name = items)]
+    struct NewItem {
         pub embedding: Option<crate::Vector>,
     }
 
@@ -95,22 +101,16 @@ mod tests {
             .execute(&mut conn)?;
 
         let new_items = vec![
-            Item {
-                id: 1,
+            NewItem {
                 embedding: Some(Vector::from(vec![1.0, 1.0, 1.0])),
             },
-            Item {
-                id: 2,
+            NewItem {
                 embedding: Some(Vector::from(vec![2.0, 2.0, 2.0])),
             },
-            Item {
-                id: 3,
+            NewItem {
                 embedding: Some(Vector::from(vec![1.0, 1.0, 2.0])),
             },
-            Item {
-                id: 4,
-                embedding: None,
-            },
+            NewItem { embedding: None },
         ];
 
         diesel::insert_into(items::table)
