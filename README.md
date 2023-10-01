@@ -42,7 +42,9 @@ client.execute("CREATE TABLE items (id bigserial PRIMARY KEY, embedding vector(3
 Create a vector from a `Vec<f32>`
 
 ```rust
-let embedding = pgvector::Vector::from(vec![1.0, 2.0, 3.0]);
+use pgvector::Vector;
+
+let embedding = Vector::from(vec![1.0, 2.0, 3.0]);
 ```
 
 Insert a vector
@@ -61,13 +63,13 @@ Retrieve a vector
 
 ```rust
 let row = client.query_one("SELECT embedding FROM items LIMIT 1", &[])?;
-let embedding: pgvector::Vector = row.get(0);
+let embedding: Vector = row.get(0);
 ```
 
 Use `Option` if the value could be `NULL`
 
 ```rust
-let embedding: Option<pgvector::Vector> = row.get(0);
+let embedding: Option<Vector> = row.get(0);
 ```
 
 ## SQLx
@@ -93,7 +95,9 @@ sqlx::query("CREATE TABLE items (id bigserial PRIMARY KEY, embedding vector(3))"
 Create a vector from a `Vec<f32>`
 
 ```rust
-let embedding = pgvector::Vector::from(vec![1.0, 2.0, 3.0]);
+use pgvector::Vector;
+
+let embedding = Vector::from(vec![1.0, 2.0, 3.0]);
 ```
 
 Insert a vector
@@ -115,7 +119,7 @@ Retrieve a vector
 
 ```rust
 let row = sqlx::query("SELECT embedding FROM items LIMIT 1").fetch_one(&pool).await?;
-let embedding: pgvector::Vector = row.try_get("embedding")?;
+let embedding: Vector = row.try_get("embedding")?;
 ```
 
 ## Diesel
@@ -175,7 +179,9 @@ pub struct Item {
 Create a vector from a `Vec<f32>`
 
 ```rust
-let embedding = pgvector::Vector::from(vec![1.0, 2.0, 3.0]);
+use pgvector::Vector;
+
+let embedding = Vector::from(vec![1.0, 2.0, 3.0]);
 ```
 
 Insert a vector
