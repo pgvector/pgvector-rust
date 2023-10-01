@@ -164,6 +164,7 @@ You can now use the `vector` type in future migrations
 
 ```sql
 CREATE TABLE items (
+  id SERIAL PRIMARY KEY,
   embedding VECTOR(3)
 )
 ```
@@ -171,23 +172,28 @@ CREATE TABLE items (
 For models, use:
 
 ```rust
+use pgvector::Vector;
+
 pub struct Item {
-    pub embedding: Option<pgvector::Vector>
+    pub id: i32,
+    pub embedding: Option<Vector>,
+}
+
+pub struct NewItem {
+    pub embedding: Option<Vector>,
 }
 ```
 
 Create a vector from a `Vec<f32>`
 
 ```rust
-use pgvector::Vector;
-
 let embedding = Vector::from(vec![1.0, 2.0, 3.0]);
 ```
 
 Insert a vector
 
 ```rust
-let new_item = Item {
+let new_item = NewItem {
     embedding: Some(embedding)
 };
 
