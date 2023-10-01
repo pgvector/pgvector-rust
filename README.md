@@ -106,7 +106,9 @@ Get the nearest neighbors
 
 ```rust
 let rows = sqlx::query("SELECT * FROM items ORDER BY embedding <-> $1 LIMIT 1")
-    .bind(embedding).fetch_all(&pool).await?;
+    .bind(embedding)
+    .fetch_all(&pool)
+    .await?;
 ```
 
 Retrieve a vector
