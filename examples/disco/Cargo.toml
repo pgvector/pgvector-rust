@@ -6,6 +6,6 @@ publish = false
 
 [dependencies]
 csv = "1"
-discorec = "0.1"
+discorec = "0.2"
 pgvector = { path = "../..", features = ["postgres"] }
 postgres = "0.19"
