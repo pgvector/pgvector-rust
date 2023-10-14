@@ -20,3 +20,4 @@ jobs:
       - run: cargo test --features postgres
       - run: cargo test --features sqlx
       - run: cargo test --features diesel
+      - run: cargo test --features serde

@@ -10,6 +10,7 @@ use crate::diesel_ext::VectorType;
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "diesel", derive(FromSqlRow, AsExpression))]
 #[cfg_attr(feature = "diesel", diesel(sql_type = VectorType))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Vector(pub(crate) Vec<f32>);
 
 impl From<Vec<f32>> for Vector {
@@ -69,5 +70,17 @@ mod tests {
     fn test_to_vec() {
         let vec = Vector::from(vec![1.0, 2.0, 3.0]);
         assert_eq!(vec.to_vec(), vec![1.0, 2.0, 3.0]);
+    }
+
+    #[cfg(feature = "serde")]
+    #[test]
+    fn test_serde_roundtrip() {
+        let vec = Vector::from(vec![1.0, 2.0, 3.0]);
+
+        let json = serde_json::to_string(&vec).unwrap();
+        assert_eq!(json, "[1.0,2.0,3.0]");
+
+        let vec2: Vector = serde_json::from_str(&json).unwrap();
+        assert_eq!(vec, vec2);
     }
 }

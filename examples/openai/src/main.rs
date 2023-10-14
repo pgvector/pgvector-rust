@@ -1,5 +1,5 @@
 use pgvector::Vector;
-use postgres::{Client, NoTls};
+use pgvec::{Client, NoTls};
 use serde_json::Value;
 use std::error::Error;
 

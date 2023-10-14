@@ -1,10 +1,13 @@
 [package]
-name = "pgvector"
+name = "pgvec"
 version = "0.2.2"
-description = "pgvector support for Rust"
-repository = "https://github.com/pgvector/pgvector-rust"
+description = "serializable pgvector support for Rust"
+repository = "https://github.com/appcypher/pgvec"
 license = "MIT OR Apache-2.0"
-authors = ["Andrew Kane <andrew@ankane.org>"]
+authors = [
+    "Andrew Kane <andrew@ankane.org>",
+    "Stephen Akinyemi <steveakinyem@gmail.com>",
+]
 edition = "2021"
 rust-version = "1.60.0"
 readme = "README.md"
@@ -17,11 +20,14 @@ bytes = { version = "1", optional = true }
 postgres = { version = "0.19", default-features = false, optional = true }
 diesel = { version = "2", default-features = false, features = ["postgres"], optional = true }
 sqlx = { version = ">= 0.5, < 0.8", default-features = false, features = ["postgres"], optional = true }
+serde = { version = "1.0", features = ["derive"], optional = true }
 
 [dev-dependencies]
 diesel = { version = "2", features = ["32-column-tables"] }
 sqlx = { version = "0", default-features = false, features = ["runtime-async-std-native-tls"] }
 async-std = { version = "1", features = ["attributes"] }
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
 
 [features]
 postgres = ["dep:postgres", "dep:bytes"]

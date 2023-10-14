@@ -1,6 +1,6 @@
 use csv::ReaderBuilder;
 use discorec::{Dataset, RecommenderBuilder};
-use pgvector::Vector;
+use pgvec::Vector;
 use postgres::{Client, NoTls};
 use std::collections::HashMap;
 use std::error::Error;
@@ -21,20 +21,32 @@ fn main() -> Result<(), Box<dyn Error>> {
     client.execute("CREATE EXTENSION IF NOT EXISTS vector", &[])?;
     client.execute("DROP TABLE IF EXISTS users", &[])?;
     client.execute("DROP TABLE IF EXISTS movies", &[])?;
-    client.execute("CREATE TABLE users (id integer PRIMARY KEY, factors vector(20))", &[])?;
-    client.execute("CREATE TABLE movies (name text PRIMARY KEY, factors vector(20))", &[])?;
+    client.execute(
+        "CREATE TABLE users (id integer PRIMARY KEY, factors vector(20))",
+        &[],
+    )?;
+    client.execute(
+        "CREATE TABLE movies (name text PRIMARY KEY, factors vector(20))",
+        &[],
+    )?;
 
     let data = load_movielens(Path::new(&movielens_path));
     let recommender = RecommenderBuilder::new().factors(20).fit_explicit(&data);
 
     for user_id in recommender.user_ids() {
         let factors = Vector::from(recommender.user_factors(user_id).unwrap().to_vec());
-        client.execute("INSERT INTO users (id, factors) VALUES ($1, $2)", &[&user_id, &factors])?;
+        client.execute(
+            "INSERT INTO users (id, factors) VALUES ($1, $2)",
+            &[&user_id, &factors],
+        )?;
     }
 
     for item_id in recommender.item_ids() {
         let factors = Vector::from(recommender.item_factors(item_id).unwrap().to_vec());
-        client.execute("INSERT INTO movies (name, factors) VALUES ($1, $2)", &[&item_id, &factors])?;
+        client.execute(
+            "INSERT INTO movies (name, factors) VALUES ($1, $2)",
+            &[&item_id, &factors],
+        )?;
     }
 
     let movie = "Star Wars (1977)";

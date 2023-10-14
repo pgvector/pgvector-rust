@@ -1,10 +1,10 @@
-# pgvector-rust
+# pgvec
 
-[pgvector](https://github.com/pgvector/pgvector) support for Rust
+Serializable [pgvector](https://github.com/pgvector/pgvector) support for Rust
 
 Supports [Rust-Postgres](https://github.com/sfackler/rust-postgres), [SQLx](https://github.com/launchbadge/sqlx), and [Diesel](https://github.com/diesel-rs/diesel)
 
-[![Build Status](https://github.com/pgvector/pgvector-rust/workflows/build/badge.svg?branch=master)](https://github.com/pgvector/pgvector-rust/actions)
+[![Build Status](https://github.com/appcypher/pgvec/workflows/build/badge.svg?branch=master)](https://github.com/appcypher/pgvec/actions)
 
 ## Getting Started
 
@@ -16,15 +16,17 @@ Follow the instructions for your database library:
 
 Or check out some examples:
 
-- [Embeddings](https://github.com/pgvector/pgvector-rust/blob/master/examples/openai/src/main.rs) with OpenAI
-- [Recommendations](https://github.com/pgvector/pgvector-rust/blob/master/examples/disco/src/main.rs) with Disco
+- [Embeddings](https://github.com/appcypher/pgvec/blob/master/examples/openai/src/main.rs) with OpenAI
+- [Recommendations](https://github.com/appcypher/pgvec/blob/master/examples/disco/src/main.rs) with Disco
+
+For information on serializing the vector type, see [serialization](#serialization).
 
 ## Rust-Postgres
 
 Add this line to your application’s `Cargo.toml` under `[dependencies]`:
 
 ```toml
-pgvector = { version = "0.2", features = ["postgres"] }
+pgvec = { version = "0.2", features = ["postgres"] }
 ```
 
 Enable the extension
@@ -80,7 +82,7 @@ let embedding: Option<Vector> = row.get(0);
 Add this line to your application’s `Cargo.toml` under `[dependencies]`:
 
 ```toml
-pgvector = { version = "0.2", features = ["sqlx"] }
+pgvec = { version = "0.2", features = ["sqlx"] }
 ```
 
 Enable the extension
@@ -137,13 +139,13 @@ let embedding: Vector = row.try_get("embedding")?;
 Add this line to your application’s `Cargo.toml` under `[dependencies]`:
 
 ```toml
-pgvector = { version = "0.2", features = ["diesel"] }
+pgvec = { version = "0.2", features = ["diesel"] }
 ```
 
 And add this line to your application’s `diesel.toml` under `[print_schema]`:
 
 ```toml
-import_types = ["diesel::sql_types::*", "pgvector::sql_types::*"]
+import_types = ["diesel::sql_types::*", "pgvec::sql_types::*"]
 ```
 
 Create a migration
@@ -247,6 +249,26 @@ CREATE INDEX my_index ON items USING hnsw (embedding vector_l2_ops)
 
 Use `vector_ip_ops` for inner product and `vector_cosine_ops` for cosine distance
 
+## Serialization
+
+`pgvec` provides `serde::Serialize` and `serde::Deserialize` implementations for `Vector` so that you can use it with any serde-compatible format.
+
+To enable this feature, add this line to your application’s `Cargo.toml` under `[dependencies]`:
+
+```toml
+pgvec = { version = "0.2", features = ["serde"] }
+```
+
+You can then use `Vector` as a serializable field in your structs
+
+```rust
+#[derive(serde::Serialize, serde::Deserialize)]
+struct Item {
+    id: i32,
+    embedding: Vector,
+}
+```
+
 ## Reference
 
 Convert a vector to a `Vec<f32>`
@@ -257,22 +279,26 @@ let f32_vec: Vec<f32> = vec.into();
 
 ## History
 
-View the [changelog](https://github.com/pgvector/pgvector-rust/blob/master/CHANGELOG.md)
+View the [changelog](https://github.com/appcypher/pgvec/blob/master/CHANGELOG.md)
 
 ## Contributing
 
 Everyone is encouraged to help improve this project. Here are a few ways you can help:
 
-- [Report bugs](https://github.com/pgvector/pgvector-rust/issues)
-- Fix bugs and [submit pull requests](https://github.com/pgvector/pgvector-rust/pulls)
+- [Report bugs](https://github.com/appcypher/pgvec/issues)
+- Fix bugs and [submit pull requests](https://github.com/appcypher/pgvec/pulls)
 - Write, clarify, or fix documentation
 - Suggest or add new features
 
 To get started with development:
 
 ```sh
-git clone https://github.com/pgvector/pgvector-rust.git
-cd pgvector-rust
+git clone https://github.com/appcypher/pgvec.git
+cd pgvec
 createdb pgvector_rust_test
 cargo test --all-features
 ```
+
+## Attribution
+
+`pgvec` is a fork of [pgvector-rust](https://github.com/pgvector/pgvector-rust) with serde support.
