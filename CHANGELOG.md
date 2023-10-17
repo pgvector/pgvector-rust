@@ -1,5 +1,6 @@
 ## 0.3.0 (unreleased)
 
+- Added `serde` feature
 - Removed `postgres` from default features
 - Reduced dependencies
 - Updated Rust edition to 2021

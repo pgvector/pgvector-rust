@@ -247,6 +247,10 @@ CREATE INDEX my_index ON items USING hnsw (embedding vector_l2_ops)
 
 Use `vector_ip_ops` for inner product and `vector_cosine_ops` for cosine distance
 
+## Serialization [unreleased]
+
+Use the `serde` feature to enable serialization
+
 ## Reference
 
 Convert a vector to a `Vec<f32>`
