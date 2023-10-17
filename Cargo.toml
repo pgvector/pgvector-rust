@@ -1,6 +1,6 @@
 [package]
 name = "pgvector"
-version = "0.2.2"
+version = "0.3.0"
 description = "pgvector support for Rust"
 repository = "https://github.com/pgvector/pgvector-rust"
 license = "MIT OR Apache-2.0"

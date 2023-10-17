@@ -1,4 +1,4 @@
-## 0.3.0 (unreleased)
+## 0.3.0 (2023-10-17)
 
 - Added `serde` feature
 - Removed `postgres` from default features
