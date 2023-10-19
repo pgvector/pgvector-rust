@@ -24,7 +24,7 @@ Or check out some examples:
 Add this line to your application’s `Cargo.toml` under `[dependencies]`:
 
 ```toml
-pgvector = { version = "0.2", features = ["postgres"] }
+pgvector = { version = "0.3", features = ["postgres"] }
 ```
 
 Enable the extension
@@ -80,7 +80,7 @@ let embedding: Option<Vector> = row.get(0);
 Add this line to your application’s `Cargo.toml` under `[dependencies]`:
 
 ```toml
-pgvector = { version = "0.2", features = ["sqlx"] }
+pgvector = { version = "0.3", features = ["sqlx"] }
 ```
 
 Enable the extension
@@ -137,7 +137,7 @@ let embedding: Vector = row.try_get("embedding")?;
 Add this line to your application’s `Cargo.toml` under `[dependencies]`:
 
 ```toml
-pgvector = { version = "0.2", features = ["diesel"] }
+pgvector = { version = "0.3", features = ["diesel"] }
 ```
 
 And add this line to your application’s `diesel.toml` under `[print_schema]`:
