@@ -1,4 +1,4 @@
-## 0.3.1 (unreleased)
+## 0.3.1 (2023-10-19)
 
 - Added `as_slice` method
 

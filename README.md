@@ -259,7 +259,7 @@ Convert a vector to a `Vec<f32>`
 let f32_vec: Vec<f32> = vec.into();
 ```
 
-Get a slice [unreleased]
+Get a slice
 
 ```rust
 let slice = vec.as_slice();
