@@ -1,3 +1,7 @@
+## 0.3.1 (unreleased)
+
+- Added `as_slice` method
+
 ## 0.3.0 (2023-10-17)
 
 - Added `serde` feature

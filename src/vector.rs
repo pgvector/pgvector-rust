@@ -34,6 +34,11 @@ impl Vector {
         self.0.clone()
     }
 
+    /// Returns the vector as a slice.
+    pub fn as_slice(&self) -> &[f32] {
+        self.0.as_slice()
+    }
+
     #[cfg(any(feature = "postgres", feature = "sqlx", feature = "diesel"))]
     pub(crate) fn from_sql(buf: &[u8]) -> Result<Vector, Box<dyn std::error::Error + Sync + Send>> {
         let dim = u16::from_be_bytes(buf[0..2].try_into()?) as usize;
@@ -73,6 +78,12 @@ mod tests {
     fn test_to_vec() {
         let vec = Vector::from(vec![1.0, 2.0, 3.0]);
         assert_eq!(vec.to_vec(), vec![1.0, 2.0, 3.0]);
+    }
+
+    #[test]
+    fn test_as_slice() {
+        let vec = Vector::from(vec![1.0, 2.0, 3.0]);
+        assert_eq!(vec.as_slice(), &[1.0, 2.0, 3.0]);
     }
 
     #[cfg(feature = "serde")]

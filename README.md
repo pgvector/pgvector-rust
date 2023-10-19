@@ -259,6 +259,12 @@ Convert a vector to a `Vec<f32>`
 let f32_vec: Vec<f32> = vec.into();
 ```
 
+Get a slice [unreleased]
+
+```rust
+let slice = vec.as_slice();
+```
+
 ## History
 
 View the [changelog](https://github.com/pgvector/pgvector-rust/blob/master/CHANGELOG.md)
