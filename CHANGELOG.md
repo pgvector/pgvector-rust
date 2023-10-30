@@ -1,4 +1,4 @@
-## 0.3.2 (unreleased)
+## 0.3.2 (2023-10-30)
 
 - Fixed error with Diesel without `with-deprecated` feature
 
