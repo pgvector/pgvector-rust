@@ -20,7 +20,7 @@ sqlx = { version = ">= 0.5, < 0.8", default-features = false, features = ["postg
 serde = { version = "1", features = ["derive"], optional = true }
 
 [dev-dependencies]
-diesel = { version = "2", features = ["32-column-tables"] }
+diesel = { version = "2", default-features = false, features = ["32-column-tables"] }
 sqlx = { version = "0", default-features = false, features = ["runtime-async-std-native-tls"] }
 async-std = { version = "1", features = ["attributes"] }
 serde_json = "1"

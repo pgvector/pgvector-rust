@@ -6,6 +6,9 @@ use std::convert::TryInto;
 #[cfg(feature = "diesel")]
 use crate::diesel_ext::VectorType;
 
+#[cfg(feature = "diesel")]
+use diesel::{deserialize::FromSqlRow, expression::AsExpression};
+
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 

@@ -1,6 +1,7 @@
 use diesel::deserialize::{self, FromSql};
 use diesel::expression::{AsExpression, Expression};
 use diesel::pg::{Pg, PgValue};
+use diesel::query_builder::QueryId;
 use diesel::serialize::{self, IsNull, Output, ToSql};
 use diesel::sql_types::{Double, Nullable, SqlType};
 use std::convert::TryFrom;

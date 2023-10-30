@@ -1,3 +1,7 @@
+## 0.3.2 (unreleased)
+
+- Fixed error with Diesel without `with-deprecated` feature
+
 ## 0.3.1 (2023-10-19)
 
 - Added `as_slice` method
