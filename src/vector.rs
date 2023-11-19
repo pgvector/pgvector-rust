@@ -1,5 +1,3 @@
-use std::cmp::PartialEq;
-
 #[cfg(any(feature = "postgres", feature = "sqlx", feature = "diesel"))]
 use std::convert::TryInto;
 
@@ -13,7 +11,7 @@ use diesel::{deserialize::FromSqlRow, expression::AsExpression};
 use serde::{Deserialize, Serialize};
 
 /// A vector.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "diesel", derive(FromSqlRow, AsExpression))]
 #[cfg_attr(feature = "diesel", diesel(sql_type = VectorType))]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
@@ -57,12 +55,6 @@ impl Vector {
         }
 
         Ok(Vector(vec))
-    }
-}
-
-impl PartialEq for Vector {
-    fn eq(&self, other: &Self) -> bool {
-        self.0 == other.0
     }
 }
 
