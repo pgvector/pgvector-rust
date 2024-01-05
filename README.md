@@ -140,10 +140,11 @@ Add this line to your application’s `Cargo.toml` under `[dependencies]`:
 pgvector = { version = "0.3", features = ["diesel"] }
 ```
 
-And add this line to your application’s `diesel.toml` under `[print_schema]`:
+And update your application’s `diesel.toml` under `[print_schema]`:
 
 ```toml
 import_types = ["diesel::sql_types::*", "pgvector::sql_types::*"]
+generate_missing_sql_type_definitions = false
 ```
 
 Create a migration
