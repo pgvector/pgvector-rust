@@ -4,7 +4,7 @@
 
 Supports [Rust-Postgres](https://github.com/sfackler/rust-postgres), [SQLx](https://github.com/launchbadge/sqlx), and [Diesel](https://github.com/diesel-rs/diesel)
 
-[![Build Status](https://github.com/pgvector/pgvector-rust/workflows/build/badge.svg?branch=master)](https://github.com/pgvector/pgvector-rust/actions)
+[![Build Status](https://github.com/pgvector/pgvector-rust/actions/workflows/build.yml/badge.svg)](https://github.com/pgvector/pgvector-rust/actions)
 
 ## Getting Started
 
