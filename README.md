@@ -241,9 +241,9 @@ let distances = items::table
 Add an approximate index in a migration
 
 ```sql
-CREATE INDEX my_index ON items USING ivfflat (embedding vector_l2_ops) WITH (lists = 100)
--- or
 CREATE INDEX my_index ON items USING hnsw (embedding vector_l2_ops)
+-- or
+CREATE INDEX my_index ON items USING ivfflat (embedding vector_l2_ops) WITH (lists = 100)
 ```
 
 Use `vector_ip_ops` for inner product and `vector_cosine_ops` for cosine distance
