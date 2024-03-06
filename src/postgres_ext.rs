@@ -38,6 +38,7 @@ impl ToSql for Vector {
 #[cfg(test)]
 mod tests {
     use crate::Vector;
+    use postgres::binary_copy::BinaryCopyInWriter;
     use postgres::{Client, NoTls};
 
     #[test]
@@ -97,6 +98,15 @@ mod tests {
         )?;
         let text_res: String = text_row.get(0);
         assert_eq!("[1,2,3]", text_res);
+
+        // copy
+        let vector_type = row.columns()[0].type_().clone();
+        let writer =
+            client.copy_in("COPY postgres_items (embedding) FROM STDIN WITH (FORMAT BINARY)")?;
+        let mut writer = BinaryCopyInWriter::new(writer, &[vector_type]);
+        writer.write(&[&Vector::from(vec![1.0, 2.0, 3.0])]).unwrap();
+        writer.write(&[&Vector::from(vec![4.0, 5.0, 6.0])]).unwrap();
+        writer.finish()?;
 
         Ok(())
     }
