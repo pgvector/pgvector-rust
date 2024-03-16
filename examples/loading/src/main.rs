@@ -26,10 +26,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // create table
     client.execute("DROP TABLE IF EXISTS items", &[])?;
     client.execute(
-        &format!(
-            "CREATE TABLE items (id bigserial, embedding vector({}))",
-            dimensions
-        ),
+        &format!("CREATE TABLE items (id bigserial, embedding vector({dimensions}))"),
         &[],
     )?;
 
