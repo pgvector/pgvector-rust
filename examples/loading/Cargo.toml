@@ -8,3 +8,6 @@ publish = false
 pgvector = { path = "../..", features = ["postgres"] }
 postgres = "0.19"
 rand = "0.8"
+
+[profile.dev]
+opt-level = 1
