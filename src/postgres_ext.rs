@@ -39,6 +39,7 @@ impl ToSql for Vector {
 mod tests {
     use crate::Vector;
     use postgres::binary_copy::BinaryCopyInWriter;
+    use postgres::types::{Kind, Type};
     use postgres::{Client, NoTls};
 
     #[test]
@@ -100,7 +101,7 @@ mod tests {
         assert_eq!("[1,2,3]", text_res);
 
         // copy
-        let vector_type = row.columns()[0].type_().clone();
+        let vector_type = vector_type(&mut client)?;
         let writer =
             client.copy_in("COPY postgres_items (embedding) FROM STDIN WITH (FORMAT BINARY)")?;
         let mut writer = BinaryCopyInWriter::new(writer, &[vector_type]);
@@ -109,5 +110,15 @@ mod tests {
         writer.finish()?;
 
         Ok(())
+    }
+
+    fn vector_type(client: &mut Client) -> Result<Type, postgres::Error> {
+        let row = client.query_one("SELECT pg_type.oid, nspname AS schema FROM pg_type INNER JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace WHERE typname = 'vector'", &[])?;
+        Ok(Type::new(
+            "vector".into(),
+            row.get("oid"),
+            Kind::Simple,
+            row.get("schema"),
+        ))
     }
 }
