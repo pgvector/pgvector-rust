@@ -104,10 +104,11 @@ mod tests {
         let text_res: String = text_row.try_get("embedding").unwrap();
         assert_eq!("[1,2,3]", text_res);
 
-        let vecs = vec![vec, vec2];
         sqlx::query("ALTER TABLE sqlx_items ADD COLUMN factors vector[]")
             .execute(&pool)
             .await?;
+
+        let vecs = vec![vec, vec2];
         sqlx::query("INSERT INTO sqlx_items (factors) VALUES ($1)")
             .bind(&vecs)
             .execute(&pool)
