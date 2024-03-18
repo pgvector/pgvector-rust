@@ -48,10 +48,15 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("\nSuccess!");
 
     // create any indexes *after* loading initial data (skipping for this example)
-    // println!("Creating index");
-    // client.execute("SET maintenance_work_mem = '8GB'", &[])?;
-    // client.execute("SET max_parallel_maintenance_workers = 7", &[])?;
-    // client.execute("CREATE INDEX ON items USING hnsw (embedding vector_cosine_ops)", &[])?;
+    if false {
+        println!("Creating index");
+        client.execute("SET maintenance_work_mem = '8GB'", &[])?;
+        client.execute("SET max_parallel_maintenance_workers = 7", &[])?;
+        client.execute(
+            "CREATE INDEX ON items USING hnsw (embedding vector_cosine_ops)",
+            &[],
+        )?;
+    }
 
     // update planner statistics for good measure
     client.execute("ANALYZE items", &[])?;
