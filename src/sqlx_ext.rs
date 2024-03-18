@@ -108,9 +108,9 @@ mod tests {
             .execute(&pool)
             .await?;
 
-        let vecs = vec![vec, vec2];
+        let vecs = &[vec, vec2];
         sqlx::query("INSERT INTO sqlx_items (factors) VALUES ($1)")
-            .bind(&vecs)
+            .bind(vecs)
             .execute(&pool)
             .await?;
 
