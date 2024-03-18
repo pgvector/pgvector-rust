@@ -48,7 +48,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("\nSuccess!");
 
     // create any indexes *after* loading initial data (skipping for this example)
-    if std::env::var("TEST_LOADING").unwrap_or("".to_string()) == "index" {
+    if std::env::var("INDEX").is_ok() {
         println!("Creating index");
         client.execute("SET maintenance_work_mem = '8GB'", &[])?;
         client.execute("SET max_parallel_maintenance_workers = 7", &[])?;
