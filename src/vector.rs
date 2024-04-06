@@ -2,7 +2,7 @@
 use std::convert::TryInto;
 
 #[cfg(feature = "diesel")]
-use crate::diesel_ext::VectorType;
+use crate::diesel_ext::vector::VectorType;
 
 #[cfg(feature = "diesel")]
 use diesel::{deserialize::FromSqlRow, expression::AsExpression};
