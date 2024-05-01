@@ -36,6 +36,7 @@ impl FromSql<VectorType, Pg> for Vector {
 diesel::infix_operator!(L2Distance, " <-> ", Double, backend: Pg);
 diesel::infix_operator!(MaxInnerProduct, " <#> ", Double, backend: Pg);
 diesel::infix_operator!(CosineDistance, " <=> ", Double, backend: Pg);
+diesel::infix_operator!(L1Distance, " <+> ", Double, backend: Pg);
 
 pub trait VectorExpressionMethods: Expression + Sized {
     fn l2_distance<T>(self, other: T) -> L2Distance<Self, T::Expression>
@@ -60,6 +61,14 @@ pub trait VectorExpressionMethods: Expression + Sized {
         T: AsExpression<Nullable<VectorType>>,
     {
         CosineDistance::new(self, other.as_expression())
+    }
+
+    fn l1_distance<T>(self, other: T) -> L1Distance<Self, T::Expression>
+    where
+        Self::SqlType: SqlType,
+        T: AsExpression<Nullable<VectorType>>,
+    {
+        L1Distance::new(self, other.as_expression())
     }
 }
 
@@ -151,6 +160,15 @@ mod tests {
             .load::<Item>(&mut conn)?;
         assert_eq!(
             vec![1, 2, 3, 4],
+            neighbors.iter().map(|v| v.id).collect::<Vec<i32>>()
+        );
+
+        let neighbors = items::table
+            .order(items::embedding.l1_distance(Vector::from(vec![1.0, 1.0, 1.0])))
+            .limit(5)
+            .load::<Item>(&mut conn)?;
+        assert_eq!(
+            vec![1, 3, 2, 4],
             neighbors.iter().map(|v| v.id).collect::<Vec<i32>>()
         );
 
