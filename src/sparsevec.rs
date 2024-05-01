@@ -9,6 +9,10 @@ pub struct SparseVec {
 impl SparseVec {
     /// Creates a sparse vector.
     pub fn new(dim: usize, indices: Vec<i32>, values: Vec<f32>) -> SparseVec {
+        // TODO assert indices sorted
+        assert_eq!(indices.len(), values.len());
+        assert!(indices.len() < dim);
+
         SparseVec {
             dim,
             indices,
