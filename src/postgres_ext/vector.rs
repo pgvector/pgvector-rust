@@ -105,8 +105,8 @@ mod tests {
         let writer =
             client.copy_in("COPY postgres_items (embedding) FROM STDIN WITH (FORMAT BINARY)")?;
         let mut writer = BinaryCopyInWriter::new(writer, &[vector_type]);
-        writer.write(&[&Vector::from(vec![1.0, 2.0, 3.0])]).unwrap();
-        writer.write(&[&Vector::from(vec![4.0, 5.0, 6.0])]).unwrap();
+        writer.write(&[&Vector::from(vec![1.0, 2.0, 3.0])])?;
+        writer.write(&[&Vector::from(vec![4.0, 5.0, 6.0])])?;
         writer.finish()?;
 
         Ok(())

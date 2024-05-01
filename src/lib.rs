@@ -4,8 +4,19 @@
 #[macro_use]
 extern crate diesel;
 
+mod bit;
+mod sparsevec;
 mod vector;
+
+pub use bit::Bit;
+pub use sparsevec::SparseVec;
 pub use vector::Vector;
+
+#[cfg(feature = "halfvec")]
+mod halfvec;
+
+#[cfg(feature = "halfvec")]
+pub use halfvec::HalfVec;
 
 #[cfg(feature = "postgres")]
 mod postgres_ext;

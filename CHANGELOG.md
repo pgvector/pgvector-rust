@@ -1,3 +1,7 @@
+## 0.3.3 (unreleased)
+
+- Added support for `halfvec`, `bit`, and `sparsevec` types to Rust-Postgres
+
 ## 0.3.2 (2023-10-30)
 
 - Fixed error with Diesel without `with-deprecated` feature

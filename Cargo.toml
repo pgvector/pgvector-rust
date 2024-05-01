@@ -18,6 +18,7 @@ postgres-types = { version = "0.2", default-features = false, optional = true }
 diesel = { version = "2", default-features = false, features = ["postgres"], optional = true }
 sqlx = { version = ">= 0.5, < 0.8", default-features = false, features = ["postgres"], optional = true }
 serde = { version = "1", features = ["derive"], optional = true }
+half = { version = "2", default-features = false, optional = true }
 
 [dev-dependencies]
 postgres = { version = "0.19", default-features = false }
@@ -28,3 +29,4 @@ serde_json = "1"
 
 [features]
 postgres = ["dep:postgres-types", "dep:bytes"]
+halfvec = ["dep:half"]
