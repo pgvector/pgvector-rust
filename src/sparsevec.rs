@@ -23,8 +23,10 @@ impl SparseVec {
         let mut values = Vec::new();
 
         for (i, v) in vec.iter().enumerate() {
-            indices.push(i.try_into().unwrap());
-            values.push(*v);
+            if *v != 0.0 {
+                indices.push(i.try_into().unwrap());
+                values.push(*v);
+            }
         }
 
         SparseVec {
