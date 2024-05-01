@@ -14,12 +14,12 @@ impl<'a> Bit<'a> {
         }
     }
 
-    /// Returns the number of bits in the vector.
+    /// Returns the number of bits in the bit string.
     pub fn len(&self) -> usize {
         self.len
     }
 
-    /// Returns the vector as a slice of bytes.
+    /// Returns the bit string as a slice of bytes.
     pub fn as_bytes(&self) -> &'a [u8] {
         self.data
     }
