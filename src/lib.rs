@@ -29,7 +29,9 @@ mod diesel_ext;
 
 #[cfg(feature = "diesel")]
 pub mod sql_types {
+    #[cfg(feature = "halfvec")]
     pub use super::diesel_ext::halfvec::HalfVecType as HalfVec;
+
     pub use super::diesel_ext::vector::VectorType as Vector;
 }
 
