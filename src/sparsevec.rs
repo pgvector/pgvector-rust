@@ -49,7 +49,7 @@ impl SparseVec {
         vec
     }
 
-    #[cfg(any(feature = "postgres"))]
+    #[cfg(any(feature = "postgres", feature = "sqlx"))]
     pub(crate) fn from_sql(
         buf: &[u8],
     ) -> Result<SparseVec, Box<dyn std::error::Error + Sync + Send>> {
