@@ -1,5 +1,13 @@
+#[cfg(feature = "diesel")]
+use crate::diesel_ext::sparsevec::SparseVecType;
+
+#[cfg(feature = "diesel")]
+use diesel::{deserialize::FromSqlRow, expression::AsExpression};
+
 /// A sparse vector.
 #[derive(Clone, Debug, PartialEq)]
+#[cfg_attr(feature = "diesel", derive(FromSqlRow, AsExpression))]
+#[cfg_attr(feature = "diesel", diesel(sql_type = SparseVecType))]
 pub struct SparseVec {
     pub(crate) dim: usize,
     pub(crate) indices: Vec<i32>,
@@ -49,7 +57,7 @@ impl SparseVec {
         vec
     }
 
-    #[cfg(any(feature = "postgres", feature = "sqlx"))]
+    #[cfg(any(feature = "postgres", feature = "sqlx", feature = "diesel"))]
     pub(crate) fn from_sql(
         buf: &[u8],
     ) -> Result<SparseVec, Box<dyn std::error::Error + Sync + Send>> {

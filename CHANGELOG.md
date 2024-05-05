@@ -2,7 +2,7 @@
 
 - Added support for `halfvec`, `bit`, and `sparsevec` types to Rust-Postgres
 - Added support for `halfvec` and `sparsevec` type to SQLx
-- Added support for `halfvec` type to Diesel
+- Added support for `halfvec` and `sparsevec` type to Diesel
 - Added `l1_distance` function for Diesel
 
 ## 0.3.2 (2023-10-30)
