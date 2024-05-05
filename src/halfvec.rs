@@ -27,7 +27,7 @@ impl HalfVec {
         self.0.as_slice()
     }
 
-    #[cfg(any(feature = "postgres"))]
+    #[cfg(any(feature = "postgres", feature = "sqlx"))]
     pub(crate) fn from_sql(
         buf: &[u8],
     ) -> Result<HalfVec, Box<dyn std::error::Error + Sync + Send>> {
