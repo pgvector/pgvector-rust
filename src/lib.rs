@@ -36,4 +36,4 @@ pub mod sql_types {
 }
 
 #[cfg(feature = "diesel")]
-pub use diesel_ext::vector::VectorExpressionMethods;
+pub use diesel_ext::expression_methods::VectorExpressionMethods;
