@@ -24,7 +24,7 @@ impl<'a> Bit<'a> {
         self.data
     }
 
-    #[cfg(any(feature = "postgres"))]
+    #[cfg(any(feature = "postgres", feature = "sqlx"))]
     pub(crate) fn from_sql(buf: &[u8]) -> Result<Bit, Box<dyn std::error::Error + Sync + Send>> {
         let len = i32::from_be_bytes(buf[0..4].try_into()?) as usize;
         let data = &buf[4..4 + len / 8];
