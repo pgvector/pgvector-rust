@@ -24,3 +24,4 @@ jobs:
       - run: cargo test --features serde
       - run: cargo test --features postgres,halfvec
       - run: cargo test --features sqlx,halfvec
+      - run: cargo test --features diesel,halfvec

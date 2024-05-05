@@ -1,7 +1,15 @@
 use half::f16;
 
+#[cfg(feature = "diesel")]
+use crate::diesel_ext::halfvec::HalfVecType;
+
+#[cfg(feature = "diesel")]
+use diesel::{deserialize::FromSqlRow, expression::AsExpression};
+
 /// A half vector.
 #[derive(Clone, Debug, PartialEq)]
+#[cfg_attr(feature = "diesel", derive(FromSqlRow, AsExpression))]
+#[cfg_attr(feature = "diesel", diesel(sql_type = HalfVecType))]
 pub struct HalfVec(pub(crate) Vec<f16>);
 
 impl From<Vec<f16>> for HalfVec {
@@ -27,7 +35,7 @@ impl HalfVec {
         self.0.as_slice()
     }
 
-    #[cfg(any(feature = "postgres", feature = "sqlx"))]
+    #[cfg(any(feature = "postgres", feature = "sqlx", feature = "diesel"))]
     pub(crate) fn from_sql(
         buf: &[u8],
     ) -> Result<HalfVec, Box<dyn std::error::Error + Sync + Send>> {
