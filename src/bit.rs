@@ -61,4 +61,11 @@ mod tests {
         assert_eq!(16, vec.len());
         assert_eq!(&[0b00000000, 0b11111111], vec.as_bytes());
     }
+
+    #[test]
+    fn test_empty() {
+        let vec = Bit::new(&[]);
+        assert_eq!(0, vec.len());
+        assert!(vec.as_bytes().is_empty());
+    }
 }
