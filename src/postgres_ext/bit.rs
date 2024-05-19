@@ -53,26 +53,26 @@ mod tests {
         client.execute("CREATE EXTENSION IF NOT EXISTS vector", &[])?;
         client.execute("DROP TABLE IF EXISTS postgres_bit_items", &[])?;
         client.execute(
-            "CREATE TABLE postgres_bit_items (id bigserial PRIMARY KEY, embedding bit(8))",
+            "CREATE TABLE postgres_bit_items (id bigserial PRIMARY KEY, embedding bit(3))",
             &[],
         )?;
 
-        let vec = Bit::from_bytes(&[0b10101010]);
-        let vec2 = Bit::from_bytes(&[0b01010101]);
+        let vec = Bit::new(&[true, false, true]);
+        let vec2 = Bit::new(&[false, true, false]);
         client.execute(
             "INSERT INTO postgres_bit_items (embedding) VALUES ($1), ($2), (NULL)",
             &[&vec, &vec2],
         )?;
 
-        let query_vec = Bit::from_bytes(&[0b10101010]);
+        let query_vec = Bit::new(&[true, false, true]);
         let row = client.query_one(
             "SELECT embedding FROM postgres_bit_items ORDER BY embedding <~> $1 LIMIT 1",
             &[&query_vec],
         )?;
         let res_vec: Bit = row.get(0);
         assert_eq!(vec, res_vec);
-        assert_eq!(8, res_vec.len());
-        assert_eq!(&[0b10101010], res_vec.as_bytes());
+        assert_eq!(3, res_vec.len());
+        assert_eq!(&[0b10100000], res_vec.as_bytes());
 
         let null_row = client.query_one(
             "SELECT embedding FROM postgres_bit_items WHERE embedding IS NULL LIMIT 1",
@@ -87,15 +87,15 @@ mod tests {
             &[],
         )?;
         let text_res: String = text_row.get(0);
-        assert_eq!("10101010", text_res);
+        assert_eq!("101", text_res);
 
         // copy
         let bit_type = Type::BIT;
         let writer = client
             .copy_in("COPY postgres_bit_items (embedding) FROM STDIN WITH (FORMAT BINARY)")?;
         let mut writer = BinaryCopyInWriter::new(writer, &[bit_type]);
-        writer.write(&[&Bit::from_bytes(&[0b10101010])])?;
-        writer.write(&[&Bit::from_bytes(&[0b01010101])])?;
+        writer.write(&[&Bit::new(&[true, false, true])])?;
+        writer.write(&[&Bit::new(&[false, true, false])])?;
         writer.finish()?;
 
         Ok(())
