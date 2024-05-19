@@ -57,19 +57,25 @@ mod tests {
         sqlx::query("DROP TABLE IF EXISTS sqlx_bit_items")
             .execute(&pool)
             .await?;
-        sqlx::query("CREATE TABLE sqlx_bit_items (id bigserial PRIMARY KEY, embedding bit(3))")
+        sqlx::query("CREATE TABLE sqlx_bit_items (id bigserial PRIMARY KEY, embedding bit(10))")
             .execute(&pool)
             .await?;
 
-        let vec = Bit::new(&[true, false, true]);
-        let vec2 = Bit::new(&[false, true, false]);
+        let vec = Bit::new(&[
+            true, false, true, false, false, false, false, false, false, true,
+        ]);
+        let vec2 = Bit::new(&[
+            false, true, false, false, false, false, false, false, false, true,
+        ]);
         sqlx::query("INSERT INTO sqlx_bit_items (embedding) VALUES ($1), ($2), (NULL)")
             .bind(&vec)
             .bind(&vec2)
             .execute(&pool)
             .await?;
 
-        let query_vec = Bit::new(&[true, false, true]);
+        let query_vec = Bit::new(&[
+            true, false, true, false, false, false, false, false, false, true,
+        ]);
         let row =
             sqlx::query("SELECT embedding FROM sqlx_bit_items ORDER BY embedding <~> $1 LIMIT 1")
                 .bind(query_vec)
@@ -77,7 +83,7 @@ mod tests {
                 .await?;
         let res_vec: Bit = row.try_get("embedding").unwrap();
         assert_eq!(vec, res_vec);
-        assert_eq!(&[0b10100000], res_vec.as_bytes());
+        assert_eq!(&[0b10100000, 0b01000000], res_vec.as_bytes());
 
         let null_row =
             sqlx::query("SELECT embedding FROM sqlx_bit_items WHERE embedding IS NULL LIMIT 1")
@@ -92,9 +98,9 @@ mod tests {
                 .fetch_one(&pool)
                 .await?;
         let text_res: String = text_row.try_get("embedding").unwrap();
-        assert_eq!("101", text_res);
+        assert_eq!("1010000001", text_res);
 
-        sqlx::query("ALTER TABLE sqlx_bit_items ADD COLUMN factors bit(3)[]")
+        sqlx::query("ALTER TABLE sqlx_bit_items ADD COLUMN factors bit(10)[]")
             .execute(&pool)
             .await?;
 
