@@ -63,24 +63,24 @@ mod tests {
         diesel::sql_query("CREATE EXTENSION IF NOT EXISTS vector").execute(&mut conn)?;
         diesel::sql_query("DROP TABLE IF EXISTS diesel_bit_items").execute(&mut conn)?;
         diesel::sql_query(
-            "CREATE TABLE diesel_bit_items (id serial PRIMARY KEY, embedding bit(10))",
+            "CREATE TABLE diesel_bit_items (id serial PRIMARY KEY, embedding bit(9))",
         )
         .execute(&mut conn)?;
 
         let new_items = vec![
             NewItem {
                 embedding: Some(Bit::new(&[
-                    false, false, false, false, false, false, false, false, false, true,
+                    false, false, false, false, false, false, false, false, true,
                 ])),
             },
             NewItem {
                 embedding: Some(Bit::new(&[
-                    true, false, true, false, false, false, false, false, false, true,
+                    false, true, false, true, false, false, false, false, true,
                 ])),
             },
             NewItem {
                 embedding: Some(Bit::new(&[
-                    true, true, true, false, false, false, false, false, false, true,
+                    false, true, true, true, false, false, false, false, true,
                 ])),
             },
             NewItem { embedding: None },
@@ -95,7 +95,7 @@ mod tests {
 
         let neighbors = items::table
             .order(items::embedding.hamming_distance(Bit::new(&[
-                true, false, true, false, false, false, false, false, false, true,
+                false, true, false, true, false, false, false, false, true,
             ])))
             .limit(5)
             .load::<Item>(&mut conn)?;
@@ -105,14 +105,14 @@ mod tests {
         );
         assert_eq!(
             Some(Bit::new(&[
-                true, false, true, false, false, false, false, false, false, true
+                false, true, false, true, false, false, false, false, true
             ])),
             neighbors.first().unwrap().embedding
         );
 
         let neighbors = items::table
             .order(items::embedding.jaccard_distance(Bit::new(&[
-                true, false, true, false, false, false, false, false, false, true,
+                false, true, false, true, false, false, false, false, true,
             ])))
             .limit(5)
             .load::<Item>(&mut conn)?;
@@ -123,7 +123,7 @@ mod tests {
 
         let distances = items::table
             .select(items::embedding.hamming_distance(Bit::new(&[
-                true, false, true, false, false, false, false, false, false, true,
+                false, true, false, true, false, false, false, false, true,
             ])))
             .order(items::id)
             .load::<Option<f64>>(&mut conn)?;

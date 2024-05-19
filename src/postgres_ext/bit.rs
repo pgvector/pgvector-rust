@@ -49,32 +49,26 @@ mod tests {
         client.execute("CREATE EXTENSION IF NOT EXISTS vector", &[])?;
         client.execute("DROP TABLE IF EXISTS postgres_bit_items", &[])?;
         client.execute(
-            "CREATE TABLE postgres_bit_items (id bigserial PRIMARY KEY, embedding bit(10))",
+            "CREATE TABLE postgres_bit_items (id bigserial PRIMARY KEY, embedding bit(9))",
             &[],
         )?;
 
-        let vec = Bit::new(&[
-            true, false, true, false, false, false, false, false, false, true,
-        ]);
-        let vec2 = Bit::new(&[
-            false, true, false, false, false, false, false, false, false, true,
-        ]);
+        let vec = Bit::new(&[false, true, false, true, false, false, false, false, true]);
+        let vec2 = Bit::new(&[false, false, true, false, false, false, false, false, true]);
         client.execute(
             "INSERT INTO postgres_bit_items (embedding) VALUES ($1), ($2), (NULL)",
             &[&vec, &vec2],
         )?;
 
-        let query_vec = Bit::new(&[
-            true, false, true, false, false, false, false, false, false, true,
-        ]);
+        let query_vec = Bit::new(&[false, true, false, true, false, false, false, false, true]);
         let row = client.query_one(
             "SELECT embedding FROM postgres_bit_items ORDER BY embedding <~> $1 LIMIT 1",
             &[&query_vec],
         )?;
         let res_vec: Bit = row.get(0);
         assert_eq!(vec, res_vec);
-        assert_eq!(10, res_vec.len());
-        assert_eq!(&[0b10100000, 0b01000000], res_vec.as_bytes());
+        assert_eq!(9, res_vec.len());
+        assert_eq!(&[0b01010000, 0b10000000], res_vec.as_bytes());
 
         let null_row = client.query_one(
             "SELECT embedding FROM postgres_bit_items WHERE embedding IS NULL LIMIT 1",
@@ -89,7 +83,7 @@ mod tests {
             &[],
         )?;
         let text_res: String = text_row.get(0);
-        assert_eq!("1010000001", text_res);
+        assert_eq!("010100001", text_res);
 
         // copy
         let bit_type = Type::BIT;
@@ -97,10 +91,10 @@ mod tests {
             .copy_in("COPY postgres_bit_items (embedding) FROM STDIN WITH (FORMAT BINARY)")?;
         let mut writer = BinaryCopyInWriter::new(writer, &[bit_type]);
         writer.write(&[&Bit::new(&[
-            true, false, true, false, false, false, false, false, false, true,
+            false, true, false, true, false, false, false, false, true,
         ])])?;
         writer.write(&[&Bit::new(&[
-            false, true, false, false, false, false, false, false, false, true,
+            false, false, true, false, false, false, false, false, true,
         ])])?;
         writer.finish()?;
 
