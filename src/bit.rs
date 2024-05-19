@@ -14,7 +14,7 @@ pub struct Bit {
 }
 
 impl Bit {
-    /// Creates a bit string for a slice of bits.
+    /// Creates a bit string from a slice of bits.
     pub fn new(data: &[bool]) -> Bit {
         let len = data.len();
         let mut bytes = vec![0; (len + 7) / 8];
@@ -24,7 +24,7 @@ impl Bit {
         Bit { len, data: bytes }
     }
 
-    /// Creates a bit string for a slice of bytes.
+    /// Creates a bit string from a slice of bytes.
     pub fn from_bytes(data: &[u8]) -> Bit {
         Bit {
             len: data.len().checked_mul(8).unwrap(),
