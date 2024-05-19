@@ -14,6 +14,16 @@ pub struct Bit {
 }
 
 impl Bit {
+    /// Creates a bit string for a slice of bits.
+    pub fn new(data: &[bool]) -> Bit {
+        let len = data.len();
+        let mut bytes = vec![0; (len + 7) / 8];
+        for (i, v) in data.iter().enumerate() {
+            bytes[i / 8] |= (*v as u8) << (7 - (i % 8));
+        }
+        Bit { len, data: bytes }
+    }
+
     /// Creates a bit string for a slice of bytes.
     pub fn from_bytes(data: &[u8]) -> Bit {
         Bit {
@@ -35,7 +45,7 @@ impl Bit {
     #[cfg(any(feature = "postgres", feature = "sqlx", feature = "diesel"))]
     pub(crate) fn from_sql(buf: &[u8]) -> Result<Bit, Box<dyn std::error::Error + Sync + Send>> {
         let len = i32::from_be_bytes(buf[0..4].try_into()?) as usize;
-        let data = buf[4..4 + len / 8].to_vec();
+        let data = buf[4..4 + (len + 7) / 8].to_vec();
 
         Ok(Bit { len, data })
     }
