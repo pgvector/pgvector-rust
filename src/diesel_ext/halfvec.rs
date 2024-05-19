@@ -6,13 +6,13 @@ use diesel::sql_types::SqlType;
 use std::convert::TryFrom;
 use std::io::Write;
 
-use crate::HalfVec;
+use crate::HalfVector;
 
 #[derive(SqlType, QueryId)]
 #[diesel(postgres_type(name = "halfvec"))]
-pub struct HalfVecType;
+pub struct HalfVectorType;
 
-impl ToSql<HalfVecType, Pg> for HalfVec {
+impl ToSql<HalfVectorType, Pg> for HalfVector {
     fn to_sql<'b>(&'b self, out: &mut Output<'b, '_, Pg>) -> serialize::Result {
         let dim = self.0.len();
         out.write_all(&u16::try_from(dim)?.to_be_bytes())?;
@@ -26,15 +26,15 @@ impl ToSql<HalfVecType, Pg> for HalfVec {
     }
 }
 
-impl FromSql<HalfVecType, Pg> for HalfVec {
+impl FromSql<HalfVectorType, Pg> for HalfVector {
     fn from_sql(value: PgValue<'_>) -> deserialize::Result<Self> {
-        HalfVec::from_sql(value.as_bytes())
+        HalfVector::from_sql(value.as_bytes())
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{HalfVec, VectorExpressionMethods};
+    use crate::{HalfVector, VectorExpressionMethods};
     use diesel::pg::PgConnection;
     use diesel::{Connection, QueryDsl, RunQueryDsl};
     use half::f16;
@@ -44,7 +44,7 @@ mod tests {
 
         diesel_half_items (id) {
             id -> Int4,
-            embedding -> Nullable<crate::sql_types::HalfVec>,
+            embedding -> Nullable<crate::sql_types::HalfVector>,
         }
     }
 
@@ -54,13 +54,13 @@ mod tests {
     #[diesel(table_name = items)]
     struct Item {
         pub id: i32,
-        pub embedding: Option<HalfVec>,
+        pub embedding: Option<HalfVector>,
     }
 
     #[derive(Insertable)]
     #[diesel(table_name = items)]
     struct NewItem {
-        pub embedding: Option<HalfVec>,
+        pub embedding: Option<HalfVector>,
     }
 
     #[test]
@@ -75,21 +75,21 @@ mod tests {
 
         let new_items = vec![
             NewItem {
-                embedding: Some(HalfVec::from(vec![
+                embedding: Some(HalfVector::from(vec![
                     f16::from_f32(1.0),
                     f16::from_f32(1.0),
                     f16::from_f32(1.0),
                 ])),
             },
             NewItem {
-                embedding: Some(HalfVec::from(vec![
+                embedding: Some(HalfVector::from(vec![
                     f16::from_f32(2.0),
                     f16::from_f32(2.0),
                     f16::from_f32(2.0),
                 ])),
             },
             NewItem {
-                embedding: Some(HalfVec::from(vec![
+                embedding: Some(HalfVector::from(vec![
                     f16::from_f32(1.0),
                     f16::from_f32(1.0),
                     f16::from_f32(2.0),
@@ -106,7 +106,7 @@ mod tests {
         assert_eq!(4, all.len());
 
         let neighbors = items::table
-            .order(items::embedding.l2_distance(HalfVec::from(vec![
+            .order(items::embedding.l2_distance(HalfVector::from(vec![
                 f16::from_f32(1.0),
                 f16::from_f32(1.0),
                 f16::from_f32(1.0),
@@ -118,7 +118,7 @@ mod tests {
             neighbors.iter().map(|v| v.id).collect::<Vec<i32>>()
         );
         assert_eq!(
-            Some(HalfVec::from(vec![
+            Some(HalfVector::from(vec![
                 f16::from_f32(1.0),
                 f16::from_f32(1.0),
                 f16::from_f32(1.0)
@@ -127,7 +127,7 @@ mod tests {
         );
 
         let neighbors = items::table
-            .order(items::embedding.max_inner_product(HalfVec::from(vec![
+            .order(items::embedding.max_inner_product(HalfVector::from(vec![
                 f16::from_f32(1.0),
                 f16::from_f32(1.0),
                 f16::from_f32(1.0),
@@ -140,7 +140,7 @@ mod tests {
         );
 
         let neighbors = items::table
-            .order(items::embedding.cosine_distance(HalfVec::from(vec![
+            .order(items::embedding.cosine_distance(HalfVector::from(vec![
                 f16::from_f32(1.0),
                 f16::from_f32(1.0),
                 f16::from_f32(1.0),
@@ -153,7 +153,7 @@ mod tests {
         );
 
         let neighbors = items::table
-            .order(items::embedding.l1_distance(HalfVec::from(vec![
+            .order(items::embedding.l1_distance(HalfVector::from(vec![
                 f16::from_f32(1.0),
                 f16::from_f32(1.0),
                 f16::from_f32(1.0),
@@ -166,7 +166,7 @@ mod tests {
         );
 
         let distances = items::table
-            .select(items::embedding.max_inner_product(HalfVec::from(vec![
+            .select(items::embedding.max_inner_product(HalfVector::from(vec![
                 f16::from_f32(1.0),
                 f16::from_f32(1.0),
                 f16::from_f32(1.0),

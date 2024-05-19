@@ -6,13 +6,13 @@ use diesel::sql_types::SqlType;
 use std::convert::TryFrom;
 use std::io::Write;
 
-use crate::SparseVec;
+use crate::SparseVector;
 
 #[derive(SqlType, QueryId)]
 #[diesel(postgres_type(name = "sparsevec"))]
-pub struct SparseVecType;
+pub struct SparseVectorType;
 
-impl ToSql<SparseVecType, Pg> for SparseVec {
+impl ToSql<SparseVectorType, Pg> for SparseVector {
     fn to_sql<'b>(&'b self, out: &mut Output<'b, '_, Pg>) -> serialize::Result {
         let dim = self.dim;
         let nnz = self.indices.len();
@@ -32,15 +32,15 @@ impl ToSql<SparseVecType, Pg> for SparseVec {
     }
 }
 
-impl FromSql<SparseVecType, Pg> for SparseVec {
+impl FromSql<SparseVectorType, Pg> for SparseVector {
     fn from_sql(value: PgValue<'_>) -> deserialize::Result<Self> {
-        SparseVec::from_sql(value.as_bytes())
+        SparseVector::from_sql(value.as_bytes())
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{SparseVec, VectorExpressionMethods};
+    use crate::{SparseVector, VectorExpressionMethods};
     use diesel::pg::PgConnection;
     use diesel::{Connection, QueryDsl, RunQueryDsl};
 
@@ -49,7 +49,7 @@ mod tests {
 
         diesel_sparse_items (id) {
             id -> Int4,
-            embedding -> Nullable<crate::sql_types::SparseVec>,
+            embedding -> Nullable<crate::sql_types::SparseVector>,
         }
     }
 
@@ -59,13 +59,13 @@ mod tests {
     #[diesel(table_name = items)]
     struct Item {
         pub id: i32,
-        pub embedding: Option<SparseVec>,
+        pub embedding: Option<SparseVector>,
     }
 
     #[derive(Insertable)]
     #[diesel(table_name = items)]
     struct NewItem {
-        pub embedding: Option<SparseVec>,
+        pub embedding: Option<SparseVector>,
     }
 
     #[test]
@@ -80,13 +80,13 @@ mod tests {
 
         let new_items = vec![
             NewItem {
-                embedding: Some(SparseVec::from_dense(&[1.0, 1.0, 1.0])),
+                embedding: Some(SparseVector::from_dense(&[1.0, 1.0, 1.0])),
             },
             NewItem {
-                embedding: Some(SparseVec::from_dense(&[2.0, 2.0, 2.0])),
+                embedding: Some(SparseVector::from_dense(&[2.0, 2.0, 2.0])),
             },
             NewItem {
-                embedding: Some(SparseVec::from_dense(&[1.0, 1.0, 2.0])),
+                embedding: Some(SparseVector::from_dense(&[1.0, 1.0, 2.0])),
             },
             NewItem { embedding: None },
         ];
@@ -99,7 +99,7 @@ mod tests {
         assert_eq!(4, all.len());
 
         let neighbors = items::table
-            .order(items::embedding.l2_distance(SparseVec::from_dense(&[1.0, 1.0, 1.0])))
+            .order(items::embedding.l2_distance(SparseVector::from_dense(&[1.0, 1.0, 1.0])))
             .limit(5)
             .load::<Item>(&mut conn)?;
         assert_eq!(
@@ -107,12 +107,12 @@ mod tests {
             neighbors.iter().map(|v| v.id).collect::<Vec<i32>>()
         );
         assert_eq!(
-            Some(SparseVec::from_dense(&[1.0, 1.0, 1.0])),
+            Some(SparseVector::from_dense(&[1.0, 1.0, 1.0])),
             neighbors.first().unwrap().embedding
         );
 
         let neighbors = items::table
-            .order(items::embedding.max_inner_product(SparseVec::from_dense(&[1.0, 1.0, 1.0])))
+            .order(items::embedding.max_inner_product(SparseVector::from_dense(&[1.0, 1.0, 1.0])))
             .limit(5)
             .load::<Item>(&mut conn)?;
         assert_eq!(
@@ -121,7 +121,7 @@ mod tests {
         );
 
         let neighbors = items::table
-            .order(items::embedding.cosine_distance(SparseVec::from_dense(&[1.0, 1.0, 1.0])))
+            .order(items::embedding.cosine_distance(SparseVector::from_dense(&[1.0, 1.0, 1.0])))
             .limit(5)
             .load::<Item>(&mut conn)?;
         assert_eq!(
@@ -130,7 +130,7 @@ mod tests {
         );
 
         let neighbors = items::table
-            .order(items::embedding.l1_distance(SparseVec::from_dense(&[1.0, 1.0, 1.0])))
+            .order(items::embedding.l1_distance(SparseVector::from_dense(&[1.0, 1.0, 1.0])))
             .limit(5)
             .load::<Item>(&mut conn)?;
         assert_eq!(
@@ -139,7 +139,7 @@ mod tests {
         );
 
         let distances = items::table
-            .select(items::embedding.max_inner_product(SparseVec::from_dense(&[1.0, 1.0, 1.0])))
+            .select(items::embedding.max_inner_product(SparseVector::from_dense(&[1.0, 1.0, 1.0])))
             .order(items::id)
             .load::<Option<f64>>(&mut conn)?;
         assert_eq!(vec![Some(-3.0), Some(-6.0), Some(-4.0), None], distances);

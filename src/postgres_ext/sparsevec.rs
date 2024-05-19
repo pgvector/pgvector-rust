@@ -3,11 +3,11 @@ use postgres::types::{to_sql_checked, FromSql, IsNull, ToSql, Type};
 use std::convert::TryInto;
 use std::error::Error;
 
-use crate::SparseVec;
+use crate::SparseVector;
 
-impl<'a> FromSql<'a> for SparseVec {
-    fn from_sql(_ty: &Type, raw: &'a [u8]) -> Result<SparseVec, Box<dyn Error + Sync + Send>> {
-        SparseVec::from_sql(raw)
+impl<'a> FromSql<'a> for SparseVector {
+    fn from_sql(_ty: &Type, raw: &'a [u8]) -> Result<SparseVector, Box<dyn Error + Sync + Send>> {
+        SparseVector::from_sql(raw)
     }
 
     fn accepts(ty: &Type) -> bool {
@@ -15,7 +15,7 @@ impl<'a> FromSql<'a> for SparseVec {
     }
 }
 
-impl ToSql for SparseVec {
+impl ToSql for SparseVector {
     fn to_sql(&self, _ty: &Type, w: &mut BytesMut) -> Result<IsNull, Box<dyn Error + Sync + Send>> {
         let dim = self.dim;
         let nnz = self.indices.len();
@@ -43,7 +43,7 @@ impl ToSql for SparseVec {
 
 #[cfg(test)]
 mod tests {
-    use crate::SparseVec;
+    use crate::SparseVector;
     use postgres::binary_copy::BinaryCopyInWriter;
     use postgres::types::{Kind, Type};
     use postgres::{Client, NoTls};
@@ -64,26 +64,26 @@ mod tests {
             &[],
         )?;
 
-        let vec = SparseVec::new(5, vec![0, 2, 4], vec![1.0, 2.0, 3.0]);
-        let vec2 = SparseVec::new(5, vec![0, 2, 4], vec![4.0, 5.0, 6.0]);
+        let vec = SparseVector::new(5, vec![0, 2, 4], vec![1.0, 2.0, 3.0]);
+        let vec2 = SparseVector::new(5, vec![0, 2, 4], vec![4.0, 5.0, 6.0]);
         client.execute(
             "INSERT INTO postgres_sparse_items (embedding) VALUES ($1), ($2), (NULL)",
             &[&vec, &vec2],
         )?;
 
-        let query_vec = SparseVec::new(5, vec![0, 2, 4], vec![3.0, 1.0, 2.0]);
+        let query_vec = SparseVector::new(5, vec![0, 2, 4], vec![3.0, 1.0, 2.0]);
         let row = client.query_one(
             "SELECT embedding FROM postgres_sparse_items ORDER BY embedding <-> $1 LIMIT 1",
             &[&query_vec],
         )?;
-        let res_vec: SparseVec = row.get(0);
+        let res_vec: SparseVector = row.get(0);
         assert_eq!(vec, res_vec);
 
         let null_row = client.query_one(
             "SELECT embedding FROM postgres_sparse_items WHERE embedding IS NULL LIMIT 1",
             &[],
         )?;
-        let null_res: Option<SparseVec> = null_row.get(0);
+        let null_res: Option<SparseVector> = null_row.get(0);
         assert!(null_res.is_none());
 
         // ensures binary format is correct
@@ -99,8 +99,8 @@ mod tests {
         let writer = client
             .copy_in("COPY postgres_sparse_items (embedding) FROM STDIN WITH (FORMAT BINARY)")?;
         let mut writer = BinaryCopyInWriter::new(writer, &[sparsevec_type]);
-        writer.write(&[&SparseVec::new(5, vec![0, 2, 4], vec![1.0, 2.0, 3.0])])?;
-        writer.write(&[&SparseVec::new(5, vec![0, 2, 4], vec![4.0, 5.0, 6.0])])?;
+        writer.write(&[&SparseVector::new(5, vec![0, 2, 4], vec![1.0, 2.0, 3.0])])?;
+        writer.write(&[&SparseVector::new(5, vec![0, 2, 4], vec![4.0, 5.0, 6.0])])?;
         writer.finish()?;
 
         Ok(())

@@ -4,15 +4,15 @@ use sqlx::postgres::{PgArgumentBuffer, PgHasArrayType, PgTypeInfo, PgValueRef};
 use sqlx::{Decode, Encode, Postgres, Type};
 use std::convert::TryFrom;
 
-use crate::HalfVec;
+use crate::HalfVector;
 
-impl Type<Postgres> for HalfVec {
+impl Type<Postgres> for HalfVector {
     fn type_info() -> PgTypeInfo {
         PgTypeInfo::with_name("halfvec")
     }
 }
 
-impl Encode<'_, Postgres> for HalfVec {
+impl Encode<'_, Postgres> for HalfVector {
     fn encode_by_ref(&self, buf: &mut PgArgumentBuffer) -> IsNull {
         let dim = self.0.len();
         buf.extend(&u16::try_from(dim).unwrap().to_be_bytes());
@@ -26,14 +26,14 @@ impl Encode<'_, Postgres> for HalfVec {
     }
 }
 
-impl Decode<'_, Postgres> for HalfVec {
+impl Decode<'_, Postgres> for HalfVector {
     fn decode(value: PgValueRef<'_>) -> Result<Self, BoxDynError> {
         let buf = <&[u8] as Decode<Postgres>>::decode(value)?;
-        HalfVec::from_sql(buf)
+        HalfVector::from_sql(buf)
     }
 }
 
-impl PgHasArrayType for HalfVec {
+impl PgHasArrayType for HalfVector {
     fn array_type_info() -> PgTypeInfo {
         PgTypeInfo::with_name("_halfvec")
     }
@@ -41,7 +41,7 @@ impl PgHasArrayType for HalfVec {
 
 #[cfg(test)]
 mod tests {
-    use crate::HalfVec;
+    use crate::HalfVector;
     use half::f16;
     use sqlx::postgres::PgPoolOptions;
     use sqlx::Row;
@@ -65,12 +65,12 @@ mod tests {
         .execute(&pool)
         .await?;
 
-        let vec = HalfVec::from(vec![
+        let vec = HalfVector::from(vec![
             f16::from_f32(1.0),
             f16::from_f32(2.0),
             f16::from_f32(3.0),
         ]);
-        let vec2 = HalfVec::from(vec![
+        let vec2 = HalfVector::from(vec![
             f16::from_f32(4.0),
             f16::from_f32(5.0),
             f16::from_f32(6.0),
@@ -81,7 +81,7 @@ mod tests {
             .execute(&pool)
             .await?;
 
-        let query_vec = HalfVec::from(vec![
+        let query_vec = HalfVector::from(vec![
             f16::from_f32(3.0),
             f16::from_f32(1.0),
             f16::from_f32(2.0),
@@ -91,14 +91,14 @@ mod tests {
                 .bind(query_vec)
                 .fetch_one(&pool)
                 .await?;
-        let res_vec: HalfVec = row.try_get("embedding").unwrap();
+        let res_vec: HalfVector = row.try_get("embedding").unwrap();
         assert_eq!(vec, res_vec);
         assert_eq!(
             vec![f16::from_f32(1.0), f16::from_f32(2.0), f16::from_f32(3.0)],
             res_vec.to_vec()
         );
 
-        let empty_vec = HalfVec::from(vec![]);
+        let empty_vec = HalfVector::from(vec![]);
         let empty_res = sqlx::query("INSERT INTO sqlx_half_items (embedding) VALUES ($1)")
             .bind(&empty_vec)
             .execute(&pool)
@@ -113,7 +113,7 @@ mod tests {
             sqlx::query("SELECT embedding FROM sqlx_half_items WHERE embedding IS NULL LIMIT 1")
                 .fetch_one(&pool)
                 .await?;
-        let null_res: Option<HalfVec> = null_row.try_get("embedding").unwrap();
+        let null_res: Option<HalfVector> = null_row.try_get("embedding").unwrap();
         assert!(null_res.is_none());
 
         // ensures binary format is correct

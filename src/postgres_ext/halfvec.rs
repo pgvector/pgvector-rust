@@ -3,11 +3,11 @@ use postgres::types::{to_sql_checked, FromSql, IsNull, ToSql, Type};
 use std::convert::TryInto;
 use std::error::Error;
 
-use crate::HalfVec;
+use crate::HalfVector;
 
-impl<'a> FromSql<'a> for HalfVec {
-    fn from_sql(_ty: &Type, raw: &'a [u8]) -> Result<HalfVec, Box<dyn Error + Sync + Send>> {
-        HalfVec::from_sql(raw)
+impl<'a> FromSql<'a> for HalfVector {
+    fn from_sql(_ty: &Type, raw: &'a [u8]) -> Result<HalfVector, Box<dyn Error + Sync + Send>> {
+        HalfVector::from_sql(raw)
     }
 
     fn accepts(ty: &Type) -> bool {
@@ -15,7 +15,7 @@ impl<'a> FromSql<'a> for HalfVec {
     }
 }
 
-impl ToSql for HalfVec {
+impl ToSql for HalfVector {
     fn to_sql(&self, _ty: &Type, w: &mut BytesMut) -> Result<IsNull, Box<dyn Error + Sync + Send>> {
         let dim = self.0.len();
         w.put_u16(dim.try_into()?);
@@ -37,7 +37,7 @@ impl ToSql for HalfVec {
 
 #[cfg(test)]
 mod tests {
-    use crate::HalfVec;
+    use crate::HalfVector;
     use half::f16;
     use postgres::binary_copy::BinaryCopyInWriter;
     use postgres::types::{Kind, Type};
@@ -59,12 +59,12 @@ mod tests {
             &[],
         )?;
 
-        let vec = HalfVec::from(vec![
+        let vec = HalfVector::from(vec![
             f16::from_f32(1.0),
             f16::from_f32(2.0),
             f16::from_f32(3.0),
         ]);
-        let vec2 = HalfVec::from(vec![
+        let vec2 = HalfVector::from(vec![
             f16::from_f32(4.0),
             f16::from_f32(5.0),
             f16::from_f32(6.0),
@@ -74,7 +74,7 @@ mod tests {
             &[&vec, &vec2],
         )?;
 
-        let query_vec = HalfVec::from(vec![
+        let query_vec = HalfVector::from(vec![
             f16::from_f32(3.0),
             f16::from_f32(1.0),
             f16::from_f32(2.0),
@@ -83,14 +83,14 @@ mod tests {
             "SELECT embedding FROM postgres_half_items ORDER BY embedding <-> $1 LIMIT 1",
             &[&query_vec],
         )?;
-        let res_vec: HalfVec = row.get(0);
+        let res_vec: HalfVector = row.get(0);
         assert_eq!(vec, res_vec);
         assert_eq!(
             vec![f16::from_f32(1.0), f16::from_f32(2.0), f16::from_f32(3.0)],
             res_vec.to_vec()
         );
 
-        let empty_vec = HalfVec::from(vec![]);
+        let empty_vec = HalfVector::from(vec![]);
         let empty_res = client.execute(
             "INSERT INTO postgres_half_items (embedding) VALUES ($1)",
             &[&empty_vec],
@@ -105,7 +105,7 @@ mod tests {
             "SELECT embedding FROM postgres_half_items WHERE embedding IS NULL LIMIT 1",
             &[],
         )?;
-        let null_res: Option<HalfVec> = null_row.get(0);
+        let null_res: Option<HalfVector> = null_row.get(0);
         assert!(null_res.is_none());
 
         // ensures binary format is correct
@@ -121,12 +121,12 @@ mod tests {
         let writer = client
             .copy_in("COPY postgres_half_items (embedding) FROM STDIN WITH (FORMAT BINARY)")?;
         let mut writer = BinaryCopyInWriter::new(writer, &[halfvec_type]);
-        writer.write(&[&HalfVec::from(vec![
+        writer.write(&[&HalfVector::from(vec![
             f16::from_f32(1.0),
             f16::from_f32(2.0),
             f16::from_f32(3.0),
         ])])?;
-        writer.write(&[&HalfVec::from(vec![
+        writer.write(&[&HalfVector::from(vec![
             f16::from_f32(4.0),
             f16::from_f32(5.0),
             f16::from_f32(6.0),

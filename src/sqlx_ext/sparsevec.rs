@@ -4,15 +4,15 @@ use sqlx::postgres::{PgArgumentBuffer, PgHasArrayType, PgTypeInfo, PgValueRef};
 use sqlx::{Decode, Encode, Postgres, Type};
 use std::convert::TryFrom;
 
-use crate::SparseVec;
+use crate::SparseVector;
 
-impl Type<Postgres> for SparseVec {
+impl Type<Postgres> for SparseVector {
     fn type_info() -> PgTypeInfo {
         PgTypeInfo::with_name("sparsevec")
     }
 }
 
-impl Encode<'_, Postgres> for SparseVec {
+impl Encode<'_, Postgres> for SparseVector {
     fn encode_by_ref(&self, buf: &mut PgArgumentBuffer) -> IsNull {
         let dim = self.dim;
         let nnz = self.indices.len();
@@ -32,14 +32,14 @@ impl Encode<'_, Postgres> for SparseVec {
     }
 }
 
-impl Decode<'_, Postgres> for SparseVec {
+impl Decode<'_, Postgres> for SparseVector {
     fn decode(value: PgValueRef<'_>) -> Result<Self, BoxDynError> {
         let buf = <&[u8] as Decode<Postgres>>::decode(value)?;
-        SparseVec::from_sql(buf)
+        SparseVector::from_sql(buf)
     }
 }
 
-impl PgHasArrayType for SparseVec {
+impl PgHasArrayType for SparseVector {
     fn array_type_info() -> PgTypeInfo {
         PgTypeInfo::with_name("_sparsevec")
     }
@@ -47,7 +47,7 @@ impl PgHasArrayType for SparseVec {
 
 #[cfg(test)]
 mod tests {
-    use crate::SparseVec;
+    use crate::SparseVector;
     use sqlx::postgres::PgPoolOptions;
     use sqlx::Row;
 
@@ -70,26 +70,26 @@ mod tests {
         .execute(&pool)
         .await?;
 
-        let vec = SparseVec::from_dense(&[1.0, 2.0, 3.0]);
-        let vec2 = SparseVec::from_dense(&[4.0, 5.0, 6.0]);
+        let vec = SparseVector::from_dense(&[1.0, 2.0, 3.0]);
+        let vec2 = SparseVector::from_dense(&[4.0, 5.0, 6.0]);
         sqlx::query("INSERT INTO sqlx_sparse_items (embedding) VALUES ($1), ($2), (NULL)")
             .bind(&vec)
             .bind(&vec2)
             .execute(&pool)
             .await?;
 
-        let query_vec = SparseVec::from_dense(&[3.0, 1.0, 2.0]);
+        let query_vec = SparseVector::from_dense(&[3.0, 1.0, 2.0]);
         let row = sqlx::query(
             "SELECT embedding FROM sqlx_sparse_items ORDER BY embedding <-> $1 LIMIT 1",
         )
         .bind(query_vec)
         .fetch_one(&pool)
         .await?;
-        let res_vec: SparseVec = row.try_get("embedding").unwrap();
+        let res_vec: SparseVector = row.try_get("embedding").unwrap();
         assert_eq!(vec, res_vec);
         assert_eq!(vec![1.0, 2.0, 3.0], res_vec.to_dense());
 
-        let empty_vec = SparseVec::from_dense(&[]);
+        let empty_vec = SparseVector::from_dense(&[]);
         let empty_res = sqlx::query("INSERT INTO sqlx_sparse_items (embedding) VALUES ($1)")
             .bind(&empty_vec)
             .execute(&pool)
@@ -104,7 +104,7 @@ mod tests {
             sqlx::query("SELECT embedding FROM sqlx_sparse_items WHERE embedding IS NULL LIMIT 1")
                 .fetch_one(&pool)
                 .await?;
-        let null_res: Option<SparseVec> = null_row.try_get("embedding").unwrap();
+        let null_res: Option<SparseVector> = null_row.try_get("embedding").unwrap();
         assert!(null_res.is_none());
 
         // ensures binary format is correct

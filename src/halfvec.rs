@@ -1,7 +1,7 @@
 use half::f16;
 
 #[cfg(feature = "diesel")]
-use crate::diesel_ext::halfvec::HalfVecType;
+use crate::diesel_ext::halfvec::HalfVectorType;
 
 #[cfg(feature = "diesel")]
 use diesel::{deserialize::FromSqlRow, expression::AsExpression};
@@ -9,22 +9,22 @@ use diesel::{deserialize::FromSqlRow, expression::AsExpression};
 /// A half vector.
 #[derive(Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "diesel", derive(FromSqlRow, AsExpression))]
-#[cfg_attr(feature = "diesel", diesel(sql_type = HalfVecType))]
-pub struct HalfVec(pub(crate) Vec<f16>);
+#[cfg_attr(feature = "diesel", diesel(sql_type = HalfVectorType))]
+pub struct HalfVector(pub(crate) Vec<f16>);
 
-impl From<Vec<f16>> for HalfVec {
+impl From<Vec<f16>> for HalfVector {
     fn from(v: Vec<f16>) -> Self {
-        HalfVec(v)
+        HalfVector(v)
     }
 }
 
-impl From<HalfVec> for Vec<f16> {
-    fn from(val: HalfVec) -> Self {
+impl From<HalfVector> for Vec<f16> {
+    fn from(val: HalfVector) -> Self {
         val.0
     }
 }
 
-impl HalfVec {
+impl HalfVector {
     /// Returns a copy of the half vector as a `Vec<f16>`.
     pub fn to_vec(&self) -> Vec<f16> {
         self.0.clone()
@@ -38,7 +38,7 @@ impl HalfVec {
     #[cfg(any(feature = "postgres", feature = "sqlx", feature = "diesel"))]
     pub(crate) fn from_sql(
         buf: &[u8],
-    ) -> Result<HalfVec, Box<dyn std::error::Error + Sync + Send>> {
+    ) -> Result<HalfVector, Box<dyn std::error::Error + Sync + Send>> {
         let dim = u16::from_be_bytes(buf[0..2].try_into()?) as usize;
         let unused = u16::from_be_bytes(buf[2..4].try_into()?);
         if unused != 0 {
@@ -51,18 +51,18 @@ impl HalfVec {
             vec.push(f16::from_be_bytes(buf[s..s + 2].try_into()?));
         }
 
-        Ok(HalfVec(vec))
+        Ok(HalfVector(vec))
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::HalfVec;
+    use crate::HalfVector;
     use half::f16;
 
     #[test]
     fn test_into() {
-        let vec = HalfVec::from(vec![
+        let vec = HalfVector::from(vec![
             f16::from_f32(1.0),
             f16::from_f32(2.0),
             f16::from_f32(3.0),
@@ -76,7 +76,7 @@ mod tests {
 
     #[test]
     fn test_to_vec() {
-        let vec = HalfVec::from(vec![
+        let vec = HalfVector::from(vec![
             f16::from_f32(1.0),
             f16::from_f32(2.0),
             f16::from_f32(3.0),
@@ -89,7 +89,7 @@ mod tests {
 
     #[test]
     fn test_as_slice() {
-        let vec = HalfVec::from(vec![
+        let vec = HalfVector::from(vec![
             f16::from_f32(1.0),
             f16::from_f32(2.0),
             f16::from_f32(3.0),

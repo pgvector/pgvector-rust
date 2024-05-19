@@ -1,5 +1,5 @@
 #[cfg(feature = "diesel")]
-use crate::diesel_ext::sparsevec::SparseVecType;
+use crate::diesel_ext::sparsevec::SparseVectorType;
 
 #[cfg(feature = "diesel")]
 use diesel::{deserialize::FromSqlRow, expression::AsExpression};
@@ -7,21 +7,21 @@ use diesel::{deserialize::FromSqlRow, expression::AsExpression};
 /// A sparse vector.
 #[derive(Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "diesel", derive(FromSqlRow, AsExpression))]
-#[cfg_attr(feature = "diesel", diesel(sql_type = SparseVecType))]
-pub struct SparseVec {
+#[cfg_attr(feature = "diesel", diesel(sql_type = SparseVectorType))]
+pub struct SparseVector {
     pub(crate) dim: usize,
     pub(crate) indices: Vec<i32>,
     pub(crate) values: Vec<f32>,
 }
 
-impl SparseVec {
+impl SparseVector {
     /// Creates a sparse vector.
-    pub fn new(dim: usize, indices: Vec<i32>, values: Vec<f32>) -> SparseVec {
+    pub fn new(dim: usize, indices: Vec<i32>, values: Vec<f32>) -> SparseVector {
         // TODO assert indices sorted
         assert_eq!(indices.len(), values.len());
         assert!(indices.len() < dim);
 
-        SparseVec {
+        SparseVector {
             dim,
             indices,
             values,
@@ -29,7 +29,7 @@ impl SparseVec {
     }
 
     /// Creates a sparse vector from a dense vector.
-    pub fn from_dense(vec: &[f32]) -> SparseVec {
+    pub fn from_dense(vec: &[f32]) -> SparseVector {
         let dim = vec.len();
         let mut indices = Vec::new();
         let mut values = Vec::new();
@@ -41,7 +41,7 @@ impl SparseVec {
             }
         }
 
-        SparseVec {
+        SparseVector {
             dim,
             indices,
             values,
@@ -60,7 +60,7 @@ impl SparseVec {
     #[cfg(any(feature = "postgres", feature = "sqlx", feature = "diesel"))]
     pub(crate) fn from_sql(
         buf: &[u8],
-    ) -> Result<SparseVec, Box<dyn std::error::Error + Sync + Send>> {
+    ) -> Result<SparseVector, Box<dyn std::error::Error + Sync + Send>> {
         let dim = i32::from_be_bytes(buf[0..4].try_into()?) as usize;
         let nnz = i32::from_be_bytes(buf[4..8].try_into()?) as usize;
         let unused = i32::from_be_bytes(buf[8..12].try_into()?);
@@ -80,7 +80,7 @@ impl SparseVec {
             values.push(f32::from_be_bytes(buf[s..s + 4].try_into()?));
         }
 
-        Ok(SparseVec {
+        Ok(SparseVector {
             dim,
             indices,
             values,
@@ -90,17 +90,17 @@ impl SparseVec {
 
 #[cfg(test)]
 mod tests {
-    use crate::SparseVec;
+    use crate::SparseVector;
 
     #[test]
     fn test_from_dense() {
-        let vec = SparseVec::from_dense(&[1.0, 0.0, 2.0, 0.0, 3.0]);
+        let vec = SparseVector::from_dense(&[1.0, 0.0, 2.0, 0.0, 3.0]);
         assert_eq!(vec![1.0, 0.0, 2.0, 0.0, 3.0], vec.to_dense());
     }
 
     #[test]
     fn test_to_dense() {
-        let vec = SparseVec::new(5, vec![0, 2, 4], vec![1.0, 2.0, 3.0]);
+        let vec = SparseVector::new(5, vec![0, 2, 4], vec![1.0, 2.0, 3.0]);
         assert_eq!(vec![1.0, 0.0, 2.0, 0.0, 3.0], vec.to_dense());
     }
 }
