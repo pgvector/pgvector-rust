@@ -19,11 +19,7 @@ impl ToSql for Bit {
     fn to_sql(&self, _ty: &Type, w: &mut BytesMut) -> Result<IsNull, Box<dyn Error + Sync + Send>> {
         let len = self.len;
         w.put_i32(len.try_into()?);
-
-        for v in &self.data {
-            w.put_u8(*v);
-        }
-
+        w.put(&*self.data);
         Ok(IsNull::No)
     }
 

@@ -16,11 +16,7 @@ impl Encode<'_, Postgres> for Bit {
     fn encode_by_ref(&self, buf: &mut PgArgumentBuffer) -> IsNull {
         let len = self.len;
         buf.extend(&i32::try_from(len).unwrap().to_be_bytes());
-
-        for v in &self.data {
-            buf.extend(&v.to_be_bytes());
-        }
-
+        buf.extend(&self.data);
         IsNull::No
     }
 }

@@ -16,11 +16,7 @@ impl ToSql<BitType, Pg> for Bit {
     fn to_sql<'b>(&'b self, out: &mut Output<'b, '_, Pg>) -> serialize::Result {
         let len = self.len;
         out.write_all(&i32::try_from(len)?.to_be_bytes())?;
-
-        for v in &self.data {
-            out.write_all(&v.to_be_bytes())?;
-        }
-
+        out.write_all(&self.data)?;
         Ok(IsNull::No)
     }
 }
