@@ -37,6 +37,11 @@ impl Bit {
         self.len
     }
 
+    /// Returns whether the bit string is empty.
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
     /// Returns the bit string as a slice of bytes.
     pub fn as_bytes(&self) -> &[u8] {
         self.data.as_slice()
@@ -63,9 +68,9 @@ mod tests {
     }
 
     #[test]
-    fn test_empty() {
+    fn test_is_empty() {
         let vec = Bit::new(&[]);
         assert_eq!(0, vec.len());
-        assert!(vec.as_bytes().is_empty());
+        assert!(vec.is_empty());
     }
 }
