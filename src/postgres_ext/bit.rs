@@ -5,8 +5,8 @@ use std::error::Error;
 
 use crate::Bit;
 
-impl<'a> FromSql<'a> for Bit<'a> {
-    fn from_sql(_ty: &Type, raw: &'a [u8]) -> Result<Bit<'a>, Box<dyn Error + Sync + Send>> {
+impl<'a> FromSql<'a> for Bit {
+    fn from_sql(_ty: &Type, raw: &'a [u8]) -> Result<Bit, Box<dyn Error + Sync + Send>> {
         Bit::from_sql(raw)
     }
 
@@ -15,12 +15,12 @@ impl<'a> FromSql<'a> for Bit<'a> {
     }
 }
 
-impl<'a> ToSql for Bit<'a> {
+impl ToSql for Bit {
     fn to_sql(&self, _ty: &Type, w: &mut BytesMut) -> Result<IsNull, Box<dyn Error + Sync + Send>> {
         let len = self.len;
         w.put_i32(len.try_into()?);
 
-        for v in self.data {
+        for v in &self.data {
             w.put_u8(*v);
         }
 

@@ -6,18 +6,18 @@ use std::convert::TryFrom;
 
 use crate::Bit;
 
-impl<'a> Type<Postgres> for Bit<'a> {
+impl Type<Postgres> for Bit {
     fn type_info() -> PgTypeInfo {
         PgTypeInfo::with_name("bit")
     }
 }
 
-impl<'a> Encode<'a, Postgres> for Bit<'a> {
+impl Encode<'_, Postgres> for Bit {
     fn encode_by_ref(&self, buf: &mut PgArgumentBuffer) -> IsNull {
         let len = self.len;
         buf.extend(&i32::try_from(len).unwrap().to_be_bytes());
 
-        for v in self.data {
+        for v in &self.data {
             buf.extend(&v.to_be_bytes());
         }
 
@@ -25,14 +25,14 @@ impl<'a> Encode<'a, Postgres> for Bit<'a> {
     }
 }
 
-impl<'a> Decode<'a, Postgres> for Bit<'a> {
-    fn decode(value: PgValueRef<'a>) -> Result<Self, BoxDynError> {
+impl Decode<'_, Postgres> for Bit {
+    fn decode(value: PgValueRef<'_>) -> Result<Self, BoxDynError> {
         let buf = <&[u8] as Decode<Postgres>>::decode(value)?;
         Bit::from_sql(buf)
     }
 }
 
-impl<'a> PgHasArrayType for Bit<'a> {
+impl PgHasArrayType for Bit {
     fn array_type_info() -> PgTypeInfo {
         PgTypeInfo::with_name("_bit")
     }

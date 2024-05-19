@@ -1,16 +1,24 @@
+#[cfg(feature = "diesel")]
+use crate::diesel_ext::bit::BitType;
+
+#[cfg(feature = "diesel")]
+use diesel::{deserialize::FromSqlRow, expression::AsExpression};
+
 /// A bit string.
 #[derive(Clone, Debug, PartialEq)]
-pub struct Bit<'a> {
+#[cfg_attr(feature = "diesel", derive(FromSqlRow, AsExpression))]
+#[cfg_attr(feature = "diesel", diesel(sql_type = BitType))]
+pub struct Bit {
     pub(crate) len: usize,
-    pub(crate) data: &'a [u8],
+    pub(crate) data: Vec<u8>,
 }
 
-impl<'a> Bit<'a> {
+impl Bit {
     /// Creates a bit string for a slice of bytes.
-    pub fn from_bytes(data: &'a [u8]) -> Bit {
+    pub fn from_bytes(data: &[u8]) -> Bit {
         Bit {
             len: data.len().checked_mul(8).unwrap(),
-            data,
+            data: data.to_vec(),
         }
     }
 
@@ -20,14 +28,14 @@ impl<'a> Bit<'a> {
     }
 
     /// Returns the bit string as a slice of bytes.
-    pub fn as_bytes(&self) -> &'a [u8] {
-        self.data
+    pub fn as_bytes(&self) -> &[u8] {
+        self.data.as_slice()
     }
 
-    #[cfg(any(feature = "postgres", feature = "sqlx"))]
+    #[cfg(any(feature = "postgres", feature = "sqlx", feature = "diesel"))]
     pub(crate) fn from_sql(buf: &[u8]) -> Result<Bit, Box<dyn std::error::Error + Sync + Send>> {
         let len = i32::from_be_bytes(buf[0..4].try_into()?) as usize;
-        let data = &buf[4..4 + len / 8];
+        let data = buf[4..4 + len / 8].to_vec();
 
         Ok(Bit { len, data })
     }
