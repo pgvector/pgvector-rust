@@ -60,18 +60,18 @@ mod tests {
         client.execute("CREATE EXTENSION IF NOT EXISTS vector", &[])?;
         client.execute("DROP TABLE IF EXISTS postgres_sparse_items", &[])?;
         client.execute(
-            "CREATE TABLE postgres_sparse_items (id bigserial PRIMARY KEY, embedding sparsevec(5))",
+            "CREATE TABLE postgres_sparse_items (id bigserial PRIMARY KEY, embedding sparsevec(3))",
             &[],
         )?;
 
-        let vec = SparseVector::new(5, vec![0, 2, 4], vec![1.0, 2.0, 3.0]);
-        let vec2 = SparseVector::new(5, vec![0, 2, 4], vec![4.0, 5.0, 6.0]);
+        let vec = SparseVector::from_dense(&[1.0, 2.0, 3.0]);
+        let vec2 = SparseVector::from_dense(&[4.0, 5.0, 6.0]);
         client.execute(
             "INSERT INTO postgres_sparse_items (embedding) VALUES ($1), ($2), (NULL)",
             &[&vec, &vec2],
         )?;
 
-        let query_vec = SparseVector::new(5, vec![0, 2, 4], vec![3.0, 1.0, 2.0]);
+        let query_vec = SparseVector::from_dense(&[3.0, 1.0, 2.0]);
         let row = client.query_one(
             "SELECT embedding FROM postgres_sparse_items ORDER BY embedding <-> $1 LIMIT 1",
             &[&query_vec],
@@ -92,15 +92,15 @@ mod tests {
             &[],
         )?;
         let text_res: String = text_row.get(0);
-        assert_eq!("{1:1,3:2,5:3}/5", text_res);
+        assert_eq!("{1:1,2:2,3:3}/3", text_res);
 
         // copy
         let sparsevec_type = get_type(&mut client, "sparsevec")?;
         let writer = client
             .copy_in("COPY postgres_sparse_items (embedding) FROM STDIN WITH (FORMAT BINARY)")?;
         let mut writer = BinaryCopyInWriter::new(writer, &[sparsevec_type]);
-        writer.write(&[&SparseVector::new(5, vec![0, 2, 4], vec![1.0, 2.0, 3.0])])?;
-        writer.write(&[&SparseVector::new(5, vec![0, 2, 4], vec![4.0, 5.0, 6.0])])?;
+        writer.write(&[&SparseVector::from_dense(&[1.0, 2.0, 3.0])])?;
+        writer.write(&[&SparseVector::from_dense(&[4.0, 5.0, 6.0])])?;
         writer.finish()?;
 
         Ok(())
