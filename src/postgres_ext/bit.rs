@@ -1,5 +1,5 @@
 use bytes::{BufMut, BytesMut};
-use postgres::types::{to_sql_checked, FromSql, IsNull, ToSql, Type};
+use postgres_types::{to_sql_checked, FromSql, IsNull, ToSql, Type};
 use std::convert::TryInto;
 use std::error::Error;
 
