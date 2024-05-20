@@ -94,13 +94,13 @@ mod tests {
 
     #[test]
     fn test_from_dense() {
-        let vec = SparseVector::from_dense(&[1.0, 0.0, 2.0, 0.0, 3.0]);
-        assert_eq!(vec![1.0, 0.0, 2.0, 0.0, 3.0], vec.to_dense());
+        let vec = SparseVector::from_dense(&[1.0, 0.0, 2.0, 0.0, 3.0, 0.0]);
+        assert_eq!(vec![1.0, 0.0, 2.0, 0.0, 3.0, 0.0], vec.to_dense());
     }
 
     #[test]
     fn test_to_dense() {
-        let vec = SparseVector::new(5, vec![0, 2, 4], vec![1.0, 2.0, 3.0]);
-        assert_eq!(vec![1.0, 0.0, 2.0, 0.0, 3.0], vec.to_dense());
+        let vec = SparseVector::new(6, vec![0, 2, 4], vec![1.0, 2.0, 3.0]);
+        assert_eq!(vec![1.0, 0.0, 2.0, 0.0, 3.0, 0.0], vec.to_dense());
     }
 }
