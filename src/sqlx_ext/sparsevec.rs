@@ -87,7 +87,7 @@ mod tests {
         .await?;
         let res_vec: SparseVector = row.try_get("embedding").unwrap();
         assert_eq!(vec, res_vec);
-        assert_eq!(vec![1.0, 2.0, 3.0], res_vec.to_dense());
+        assert_eq!(vec![1.0, 2.0, 3.0], res_vec.to_vec());
 
         let empty_vec = SparseVector::from_dense(&[]);
         let empty_res = sqlx::query("INSERT INTO sqlx_sparse_items (embedding) VALUES ($1)")

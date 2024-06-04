@@ -48,8 +48,8 @@ impl SparseVector {
         }
     }
 
-    /// Returns the sparse vector as a dense vector.
-    pub fn to_dense(&self) -> Vec<f32> {
+    /// Returns the sparse vector as a `Vec<f32>`.
+    pub fn to_vec(&self) -> Vec<f32> {
         let mut vec = vec![0.0; self.dim];
         for (i, v) in self.indices.iter().zip(&self.values) {
             vec[*i as usize] = *v;
@@ -95,12 +95,12 @@ mod tests {
     #[test]
     fn test_from_dense() {
         let vec = SparseVector::from_dense(&[1.0, 0.0, 2.0, 0.0, 3.0, 0.0]);
-        assert_eq!(vec![1.0, 0.0, 2.0, 0.0, 3.0, 0.0], vec.to_dense());
+        assert_eq!(vec![1.0, 0.0, 2.0, 0.0, 3.0, 0.0], vec.to_vec());
     }
 
     #[test]
-    fn test_to_dense() {
+    fn test_to_vec() {
         let vec = SparseVector::new(6, vec![0, 2, 4], vec![1.0, 2.0, 3.0]);
-        assert_eq!(vec![1.0, 0.0, 2.0, 0.0, 3.0, 0.0], vec.to_dense());
+        assert_eq!(vec![1.0, 0.0, 2.0, 0.0, 3.0, 0.0], vec.to_vec());
     }
 }
