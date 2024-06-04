@@ -15,19 +15,6 @@ pub struct SparseVector {
 }
 
 impl SparseVector {
-    /// Creates a sparse vector.
-    pub fn new(dim: usize, indices: Vec<i32>, values: Vec<f32>) -> SparseVector {
-        // TODO assert indices sorted
-        assert_eq!(indices.len(), values.len());
-        assert!(indices.len() < dim);
-
-        SparseVector {
-            dim,
-            indices,
-            values,
-        }
-    }
-
     /// Creates a sparse vector from a dense vector.
     pub fn from_dense(vec: &[f32]) -> SparseVector {
         let dim = vec.len();
@@ -127,12 +114,6 @@ mod tests {
     fn test_from_coordinates_vec() {
         let elements = vec![(0, 1.0), (2, 2.0), (4, 3.0)];
         let vec = SparseVector::from_coordinates(elements, 6);
-        assert_eq!(vec![1.0, 0.0, 2.0, 0.0, 3.0, 0.0], vec.to_vec());
-    }
-
-    #[test]
-    fn test_to_vec() {
-        let vec = SparseVector::new(6, vec![0, 2, 4], vec![1.0, 2.0, 3.0]);
         assert_eq!(vec![1.0, 0.0, 2.0, 0.0, 3.0, 0.0], vec.to_vec());
     }
 }
