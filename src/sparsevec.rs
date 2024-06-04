@@ -117,14 +117,14 @@ mod tests {
     }
 
     #[test]
-    fn test_from_coo_map() {
+    fn test_from_coordinates_map() {
         let elements = HashMap::from([(0, 1.0), (2, 2.0), (4, 3.0)]);
         let vec = SparseVector::from_coordinates(elements, 6);
         assert_eq!(vec![1.0, 0.0, 2.0, 0.0, 3.0, 0.0], vec.to_vec());
     }
 
     #[test]
-    fn test_from_coo_vec() {
+    fn test_from_coordinates_vec() {
         let elements = vec![(0, 1.0), (2, 2.0), (4, 3.0)];
         let vec = SparseVector::from_coordinates(elements, 6);
         assert_eq!(vec![1.0, 0.0, 2.0, 0.0, 3.0, 0.0], vec.to_vec());
