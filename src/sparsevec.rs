@@ -35,12 +35,9 @@ impl SparseVector {
         }
     }
 
-    /// Creates a sparse vector from coordinates.
-    pub fn from_coordinates<I: IntoIterator<Item = (i32, f32)>>(
-        iter: I,
-        dim: usize,
-    ) -> SparseVector {
-        let mut elements: Vec<(i32, f32)> = iter.into_iter().filter(|v| v.1 != 0.0).collect();
+    /// Creates a sparse vector from `(index, value)` pairs.
+    pub fn from_pairs<I: IntoIterator<Item = (i32, f32)>>(pairs: I, dim: usize) -> SparseVector {
+        let mut elements: Vec<(i32, f32)> = pairs.into_iter().filter(|v| v.1 != 0.0).collect();
         elements.sort_by_key(|v| v.0);
         let indices: Vec<i32> = elements.iter().map(|v| v.0).collect();
         let values: Vec<f32> = elements.iter().map(|v| v.1).collect();
@@ -104,16 +101,16 @@ mod tests {
     }
 
     #[test]
-    fn test_from_coordinates_map() {
-        let elements = HashMap::from([(0, 1.0), (2, 2.0), (4, 3.0)]);
-        let vec = SparseVector::from_coordinates(elements, 6);
+    fn test_from_pairs_map() {
+        let pairs = HashMap::from([(0, 1.0), (2, 2.0), (4, 3.0)]);
+        let vec = SparseVector::from_pairs(pairs, 6);
         assert_eq!(vec![1.0, 0.0, 2.0, 0.0, 3.0, 0.0], vec.to_vec());
     }
 
     #[test]
-    fn test_from_coordinates_vec() {
-        let elements = vec![(0, 1.0), (2, 2.0), (4, 3.0)];
-        let vec = SparseVector::from_coordinates(elements, 6);
+    fn test_from_pairs_vec() {
+        let pairs = vec![(0, 1.0), (2, 2.0), (4, 3.0)];
+        let vec = SparseVector::from_pairs(pairs, 6);
         assert_eq!(vec![1.0, 0.0, 2.0, 0.0, 3.0, 0.0], vec.to_vec());
     }
 }
