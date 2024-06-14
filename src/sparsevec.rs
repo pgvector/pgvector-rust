@@ -40,7 +40,7 @@ impl SparseVector {
         iter: I,
         dim: usize,
     ) -> SparseVector {
-        let mut elements: Vec<(i32, f32)> = iter.into_iter().collect();
+        let mut elements: Vec<(i32, f32)> = iter.into_iter().filter(|v| v.1 != 0.0).collect();
         elements.sort_by_key(|v| v.0);
         let indices: Vec<i32> = elements.iter().map(|v| v.0).collect();
         let values: Vec<f32> = elements.iter().map(|v| v.1).collect();
