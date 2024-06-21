@@ -49,6 +49,21 @@ impl SparseVector {
         }
     }
 
+    /// Returns the number of dimensions.
+    pub fn dimensions(&self) -> usize {
+        self.dim
+    }
+
+    /// Returns the non-zero indices.
+    pub fn indices(&self) -> &[i32] {
+        &self.indices
+    }
+
+    /// Returns the non-zero values.
+    pub fn values(&self) -> &[f32] {
+        &self.values
+    }
+
     /// Returns the sparse vector as a `Vec<f32>`.
     pub fn to_vec(&self) -> Vec<f32> {
         let mut vec = vec![0.0; self.dim];
@@ -98,6 +113,9 @@ mod tests {
     fn test_from_dense() {
         let vec = SparseVector::from_dense(&[1.0, 0.0, 2.0, 0.0, 3.0, 0.0]);
         assert_eq!(vec![1.0, 0.0, 2.0, 0.0, 3.0, 0.0], vec.to_vec());
+        assert_eq!(6, vec.dimensions());
+        assert_eq!(&[0, 2, 4], vec.indices());
+        assert_eq!(&[1.0, 2.0, 3.0], vec.values());
     }
 
     #[test]
