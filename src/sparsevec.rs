@@ -140,4 +140,15 @@ mod tests {
         assert_eq!(&[0, 2, 4], vec.indices());
         assert_eq!(&[1.0, 2.0, 3.0], vec.values());
     }
+
+    #[test]
+    fn test_from_vec_map() {
+        let vec = vec![(0, 1.0), (2, 2.0), (4, 3.0)];
+        let map = vec.iter().map(|v| (&v.0, &v.1));
+        let vec = SparseVector::from_map(map, 6);
+        assert_eq!(vec![1.0, 0.0, 2.0, 0.0, 3.0, 0.0], vec.to_vec());
+        assert_eq!(6, vec.dimensions());
+        assert_eq!(&[0, 2, 4], vec.indices());
+        assert_eq!(&[1.0, 2.0, 3.0], vec.values());
+    }
 }
