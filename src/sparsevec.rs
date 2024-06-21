@@ -123,6 +123,9 @@ mod tests {
         let pairs = HashMap::from([(0, 1.0), (2, 2.0), (4, 3.0)]);
         let vec = SparseVector::from_pairs(pairs, 6);
         assert_eq!(vec![1.0, 0.0, 2.0, 0.0, 3.0, 0.0], vec.to_vec());
+        assert_eq!(6, vec.dimensions());
+        assert_eq!(&[0, 2, 4], vec.indices());
+        assert_eq!(&[1.0, 2.0, 3.0], vec.values());
     }
 
     #[test]
