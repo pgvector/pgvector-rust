@@ -9,7 +9,7 @@ use diesel::{deserialize::FromSqlRow, expression::AsExpression};
 #[cfg_attr(feature = "diesel", derive(FromSqlRow, AsExpression))]
 #[cfg_attr(feature = "diesel", diesel(sql_type = SparseVectorType))]
 pub struct SparseVector {
-    pub(crate) dim: usize,
+    pub(crate) dim: i32,
     pub(crate) indices: Vec<i32>,
     pub(crate) values: Vec<f32>,
 }
@@ -17,7 +17,7 @@ pub struct SparseVector {
 impl SparseVector {
     /// Creates a sparse vector from a dense vector.
     pub fn from_dense(vec: &[f32]) -> SparseVector {
-        let dim = vec.len();
+        let dim: i32 = vec.len().try_into().unwrap();
         let mut indices = Vec::new();
         let mut values = Vec::new();
 
@@ -38,7 +38,7 @@ impl SparseVector {
     /// Creates a sparse vector from a map of non-zero elements.
     pub fn from_map<'a, I: IntoIterator<Item = (&'a i32, &'a f32)>>(
         map: I,
-        dim: usize,
+        dim: i32,
     ) -> SparseVector {
         let mut elements: Vec<(&i32, &f32)> = map.into_iter().filter(|v| *v.1 != 0.0).collect();
         elements.sort_by_key(|v| *v.0);
@@ -53,7 +53,7 @@ impl SparseVector {
     }
 
     /// Returns the number of dimensions.
-    pub fn dimensions(&self) -> usize {
+    pub fn dimensions(&self) -> i32 {
         self.dim
     }
 
@@ -69,7 +69,7 @@ impl SparseVector {
 
     /// Returns the sparse vector as a `Vec<f32>`.
     pub fn to_vec(&self) -> Vec<f32> {
-        let mut vec = vec![0.0; self.dim];
+        let mut vec = vec![0.0; self.dim as usize];
         for (i, v) in self.indices.iter().zip(&self.values) {
             vec[*i as usize] = *v;
         }
@@ -80,7 +80,7 @@ impl SparseVector {
     pub(crate) fn from_sql(
         buf: &[u8],
     ) -> Result<SparseVector, Box<dyn std::error::Error + Sync + Send>> {
-        let dim = i32::from_be_bytes(buf[0..4].try_into()?) as usize;
+        let dim = i32::from_be_bytes(buf[0..4].try_into()?);
         let nnz = i32::from_be_bytes(buf[4..8].try_into()?) as usize;
         let unused = i32::from_be_bytes(buf[8..12].try_into()?);
         if unused != 0 {
