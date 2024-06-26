@@ -229,7 +229,7 @@ let neighbors = items::table
     .load::<Item>(&mut conn)?;
 ```
 
-Also supports `max_inner_product`, `cosine_distance`, `l1_distance` (unreleased), `hamming_distance` (unreleased), and `jaccard_distance` (unreleased)
+Also supports `max_inner_product`, `cosine_distance`, `l1_distance`, `hamming_distance`, and `jaccard_distance`
 
 Get the distances
 
@@ -253,7 +253,7 @@ Use `vector_ip_ops` for inner product and `vector_cosine_ops` for cosine distanc
 
 Use the `serde` feature to enable serialization
 
-## Half Vectors (unreleased)
+## Half Vectors
 
 Use the `halfvec` feature to enable half vectors
 

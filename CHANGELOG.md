@@ -1,4 +1,4 @@
-## 0.3.3 (unreleased)
+## 0.3.3 (2024-06-25)
 
 - Added support for `halfvec`, `bit`, and `sparsevec` types to Rust-Postgres
 - Added support for `halfvec`, `bit`, and `sparsevec` type to SQLx
