@@ -42,7 +42,7 @@ fn fetch_embeddings(input: &[&str]) -> Result<Vec<Vec<f32>>, Box<dyn Error>> {
         .set("Authorization", &format!("Bearer {}", api_key))
         .send_json(ureq::json!({
             "input": input,
-            "model": "text-embedding-ada-002",
+            "model": "text-embedding-3-small",
         }))?
         .into_json()?;
 
