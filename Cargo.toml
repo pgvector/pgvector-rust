@@ -30,3 +30,6 @@ serde_json = "1"
 [features]
 postgres = ["dep:postgres-types", "dep:bytes"]
 halfvec = ["dep:half"]
+
+[package.metadata.docs.rs]
+features = ["halfvec"]
