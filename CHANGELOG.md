@@ -1,3 +1,7 @@
+## 0.3.4 (unreleased)
+
+- Added `Eq` trait to `Bit`
+
 ## 0.3.3 (2024-06-25)
 
 - Added support for `halfvec`, `bit`, and `sparsevec` types to Rust-Postgres
