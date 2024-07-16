@@ -56,7 +56,7 @@ fn fetch_embeddings(texts: &[&str], input_type: &str) -> Result<Vec<Vec<u8>>, Bo
             v.as_array()
                 .unwrap()
                 .iter()
-                .map(|v| v.as_f64().unwrap() as u8)
+                .map(|v| v.as_u64().unwrap().try_into().unwrap())
                 .collect()
         })
         .collect();
