@@ -5,7 +5,7 @@ use crate::diesel_ext::bit::BitType;
 use diesel::{deserialize::FromSqlRow, expression::AsExpression};
 
 /// A bit string.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "diesel", derive(FromSqlRow, AsExpression))]
 #[cfg_attr(feature = "diesel", diesel(sql_type = BitType))]
 pub struct Bit {
