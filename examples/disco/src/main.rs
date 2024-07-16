@@ -81,7 +81,7 @@ fn load_movielens(path: &Path) -> Dataset<i32, String> {
         let row = record.unwrap();
         data.push(
             row[0].parse::<i32>().unwrap(),
-            movies.get(&row[1].to_string()).unwrap().to_string(),
+            movies.get(&row[1]).unwrap().to_string(),
             row[2].parse().unwrap(),
         );
     }
