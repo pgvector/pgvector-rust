@@ -9,3 +9,6 @@ csv = "1"
 discorec = "0.2"
 pgvector = { path = "../..", features = ["postgres"] }
 postgres = "0.19"
+
+[profile.dev]
+opt-level = 1
