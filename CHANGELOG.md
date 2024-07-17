@@ -1,4 +1,4 @@
-## 0.3.4 (unreleased)
+## 0.3.4 (2024-07-17)
 
 - Added `Eq` trait to `Bit`
 
