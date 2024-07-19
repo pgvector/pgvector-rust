@@ -48,35 +48,11 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         )?;
     }
 
-    let sql = "
-    WITH semantic_search AS (
-        SELECT id, RANK () OVER (ORDER BY embedding <=> $2) AS rank
-        FROM documents
-        ORDER BY embedding <=> $2
-        LIMIT 20
-    ),
-    keyword_search AS (
-        SELECT id, RANK () OVER (ORDER BY ts_rank_cd(to_tsvector('english', content), query) DESC)
-        FROM documents, plainto_tsquery('english', $1) query
-        WHERE to_tsvector('english', content) @@ query
-        ORDER BY ts_rank_cd(to_tsvector('english', content), query) DESC
-        LIMIT 20
-    )
-    SELECT
-        COALESCE(semantic_search.id, keyword_search.id) AS id,
-        COALESCE(1.0 / ($3::double precision + semantic_search.rank), 0.0) +
-        COALESCE(1.0 / ($3::double precision + keyword_search.rank), 0.0) AS score
-    FROM semantic_search
-    FULL OUTER JOIN keyword_search ON semantic_search.id = keyword_search.id
-    ORDER BY score DESC
-    LIMIT 5
-    ";
-
     let query = "growling bear";
     let query_embedding = model.embed(query)?;
     let k = 60.0;
 
-    for row in client.query(sql, &[&query, &Vector::from(query_embedding), &k])? {
+    for row in client.query(HYBRID_SQL, &[&query, &Vector::from(query_embedding), &k])? {
         let id: i32 = row.get(0);
         let score: f64 = row.get(1);
         println!("document: {}, RRF score: {}", id, score);
@@ -84,6 +60,30 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
 
     Ok(())
 }
+
+const HYBRID_SQL: &str = "
+WITH semantic_search AS (
+    SELECT id, RANK () OVER (ORDER BY embedding <=> $2) AS rank
+    FROM documents
+    ORDER BY embedding <=> $2
+    LIMIT 20
+),
+keyword_search AS (
+    SELECT id, RANK () OVER (ORDER BY ts_rank_cd(to_tsvector('english', content), query) DESC)
+    FROM documents, plainto_tsquery('english', $1) query
+    WHERE to_tsvector('english', content) @@ query
+    ORDER BY ts_rank_cd(to_tsvector('english', content), query) DESC
+    LIMIT 20
+)
+SELECT
+    COALESCE(semantic_search.id, keyword_search.id) AS id,
+    COALESCE(1.0 / ($3::double precision + semantic_search.rank), 0.0) +
+    COALESCE(1.0 / ($3::double precision + keyword_search.rank), 0.0) AS score
+FROM semantic_search
+FULL OUTER JOIN keyword_search ON semantic_search.id = keyword_search.id
+ORDER BY score DESC
+LIMIT 5
+";
 
 struct EmbeddingModel {
     tokenizer: Tokenizer,
