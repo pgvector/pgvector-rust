@@ -1,0 +1,15 @@
+[package]
+name = "example"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+candle-core = "0.6"
+candle-nn = "0.6"
+candle-transformers = "0.6"
+hf-hub = "0.3"
+pgvector = { path = "../..", features = ["postgres"] }
+postgres = "0.19"
+serde_json = "1"
+tokenizers = "0.19"
