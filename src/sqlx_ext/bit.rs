@@ -13,11 +13,11 @@ impl Type<Postgres> for Bit {
 }
 
 impl Encode<'_, Postgres> for Bit {
-    fn encode_by_ref(&self, buf: &mut PgArgumentBuffer) -> IsNull {
+    fn encode_by_ref(&self, buf: &mut PgArgumentBuffer) -> Result<IsNull, BoxDynError> {
         let len = self.len;
-        buf.extend(&i32::try_from(len).unwrap().to_be_bytes());
+        buf.extend(&i32::try_from(len)?.to_be_bytes());
         buf.extend(&self.data);
-        IsNull::No
+        Ok(IsNull::No)
     }
 }
 

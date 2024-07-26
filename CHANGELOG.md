@@ -1,3 +1,8 @@
+## 0.4.0 (unreleased)
+
+- Added support for SQLx 0.8
+- Dropped support for SQLx < 0.8
+
 ## 0.3.4 (2024-07-17)
 
 - Added `Eq` trait to `Bit`

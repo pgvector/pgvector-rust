@@ -13,16 +13,16 @@ impl Type<Postgres> for Vector {
 }
 
 impl Encode<'_, Postgres> for Vector {
-    fn encode_by_ref(&self, buf: &mut PgArgumentBuffer) -> IsNull {
+    fn encode_by_ref(&self, buf: &mut PgArgumentBuffer) -> Result<IsNull, BoxDynError> {
         let dim = self.0.len();
-        buf.extend(&u16::try_from(dim).unwrap().to_be_bytes());
+        buf.extend(&u16::try_from(dim)?.to_be_bytes());
         buf.extend(&0_u16.to_be_bytes());
 
         for v in &self.0 {
             buf.extend(&v.to_be_bytes());
         }
 
-        IsNull::No
+        Ok(IsNull::No)
     }
 }
 
