@@ -28,7 +28,7 @@ Or check out some examples:
 Add this line to your application’s `Cargo.toml` under `[dependencies]`:
 
 ```toml
-pgvector = { version = "0.3", features = ["postgres"] }
+pgvector = { version = "0.4", features = ["postgres"] }
 ```
 
 Enable the extension
@@ -84,8 +84,10 @@ let embedding: Option<Vector> = row.get(0);
 Add this line to your application’s `Cargo.toml` under `[dependencies]`:
 
 ```toml
-pgvector = { version = "0.3", features = ["sqlx"] }
+pgvector = { version = "0.4", features = ["sqlx"] }
 ```
+
+For SQLx < 0.8, use `version = "0.3"` and [this readme](https://github.com/pgvector/pgvector-rust/blob/v0.3.4/README.md).
 
 Enable the extension
 
@@ -141,7 +143,7 @@ let embedding: Vector = row.try_get("embedding")?;
 Add this line to your application’s `Cargo.toml` under `[dependencies]`:
 
 ```toml
-pgvector = { version = "0.3", features = ["diesel"] }
+pgvector = { version = "0.4", features = ["diesel"] }
 ```
 
 And update your application’s `diesel.toml` under `[print_schema]`:
