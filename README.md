@@ -297,3 +297,11 @@ cd pgvector-rust
 createdb pgvector_rust_test
 cargo test --all-features
 ```
+
+To run an example:
+
+```sh
+cd examples/loading
+createdb pgvector_example
+cargo run
+```
