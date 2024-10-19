@@ -16,12 +16,12 @@ impl ToSql<SparseVectorType, Pg> for SparseVector {
     fn to_sql<'b>(&'b self, out: &mut Output<'b, '_, Pg>) -> serialize::Result {
         let dim = self.dim;
         let nnz = self.indices.len();
-        out.write_all(&dim.to_be_bytes())?;
+        out.write_all(&i32::try_from(dim)?.to_be_bytes())?;
         out.write_all(&i32::try_from(nnz)?.to_be_bytes())?;
         out.write_all(&0_i32.to_be_bytes())?;
 
         for v in &self.indices {
-            out.write_all(&v.to_be_bytes())?;
+            out.write_all(&i32::try_from(*v)?.to_be_bytes())?;
         }
 
         for v in &self.values {
