@@ -69,9 +69,9 @@ impl SparseVector {
 
     /// Returns the sparse vector as a `Vec<f32>`.
     pub fn to_vec(&self) -> Vec<f32> {
-        let mut vec = vec![0.0; self.dim as usize];
+        let mut vec = vec![0.0; self.dim.try_into().unwrap()];
         for (i, v) in self.indices.iter().zip(&self.values) {
-            vec[*i as usize] = *v;
+            vec[usize::try_from(*i).unwrap()] = *v;
         }
         vec
     }
@@ -81,7 +81,7 @@ impl SparseVector {
         buf: &[u8],
     ) -> Result<SparseVector, Box<dyn std::error::Error + Sync + Send>> {
         let dim = i32::from_be_bytes(buf[0..4].try_into()?);
-        let nnz = i32::from_be_bytes(buf[4..8].try_into()?) as usize;
+        let nnz = i32::from_be_bytes(buf[4..8].try_into()?).try_into()?;
         let unused = i32::from_be_bytes(buf[8..12].try_into()?);
         if unused != 0 {
             return Err("expected unused to be 0".into());
