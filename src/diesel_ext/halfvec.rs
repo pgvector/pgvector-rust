@@ -35,8 +35,7 @@ impl FromSql<HalfVectorType, Pg> for HalfVector {
 #[cfg(test)]
 mod tests {
     use crate::{HalfVector, VectorExpressionMethods};
-    use diesel::pg::PgConnection;
-    use diesel::{Connection, QueryDsl, RunQueryDsl};
+    use diesel::prelude::*;
     use half::f16;
 
     table! {

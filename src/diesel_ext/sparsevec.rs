@@ -16,7 +16,7 @@ impl ToSql<SparseVectorType, Pg> for SparseVector {
     fn to_sql<'b>(&'b self, out: &mut Output<'b, '_, Pg>) -> serialize::Result {
         let dim = self.dim;
         let nnz = self.indices.len();
-        out.write_all(&i32::try_from(dim)?.to_be_bytes())?;
+        out.write_all(&dim.to_be_bytes())?;
         out.write_all(&i32::try_from(nnz)?.to_be_bytes())?;
         out.write_all(&0_i32.to_be_bytes())?;
 
@@ -41,8 +41,7 @@ impl FromSql<SparseVectorType, Pg> for SparseVector {
 #[cfg(test)]
 mod tests {
     use crate::{SparseVector, VectorExpressionMethods};
-    use diesel::pg::PgConnection;
-    use diesel::{Connection, QueryDsl, RunQueryDsl};
+    use diesel::prelude::*;
 
     table! {
         use diesel::sql_types::*;

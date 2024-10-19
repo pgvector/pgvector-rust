@@ -16,7 +16,7 @@ impl Encode<'_, Postgres> for SparseVector {
     fn encode_by_ref(&self, buf: &mut PgArgumentBuffer) -> Result<IsNull, BoxDynError> {
         let dim = self.dim;
         let nnz = self.indices.len();
-        buf.extend(&i32::try_from(dim)?.to_be_bytes());
+        buf.extend(dim.to_be_bytes());
         buf.extend(&i32::try_from(nnz)?.to_be_bytes());
         buf.extend(&0_i32.to_be_bytes());
 

@@ -30,8 +30,7 @@ impl FromSql<BitType, Pg> for Bit {
 #[cfg(test)]
 mod tests {
     use crate::{Bit, VectorExpressionMethods};
-    use diesel::pg::PgConnection;
-    use diesel::{Connection, QueryDsl, RunQueryDsl};
+    use diesel::prelude::*;
 
     table! {
         use diesel::sql_types::*;

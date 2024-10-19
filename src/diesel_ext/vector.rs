@@ -35,8 +35,7 @@ impl FromSql<VectorType, Pg> for Vector {
 #[cfg(test)]
 mod tests {
     use crate::{Vector, VectorExpressionMethods};
-    use diesel::pg::PgConnection;
-    use diesel::{Connection, QueryDsl, RunQueryDsl};
+    use diesel::prelude::*;
 
     table! {
         use diesel::sql_types::*;

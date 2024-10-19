@@ -19,7 +19,7 @@ impl ToSql for SparseVector {
     fn to_sql(&self, _ty: &Type, w: &mut BytesMut) -> Result<IsNull, Box<dyn Error + Sync + Send>> {
         let dim = self.dim;
         let nnz = self.indices.len();
-        w.put_i32(dim.try_into()?);
+        w.put_i32(dim);
         w.put_i32(nnz.try_into()?);
         w.put_i32(0);
 
