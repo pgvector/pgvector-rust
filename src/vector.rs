@@ -42,7 +42,7 @@ impl Vector {
 
     #[cfg(any(feature = "postgres", feature = "sqlx", feature = "diesel"))]
     pub(crate) fn from_sql(buf: &[u8]) -> Result<Vector, Box<dyn std::error::Error + Sync + Send>> {
-        let dim = u16::from_be_bytes(buf[0..2].try_into()?) as usize;
+        let dim = u16::from_be_bytes(buf[0..2].try_into()?).into();
         let unused = u16::from_be_bytes(buf[2..4].try_into()?);
         if unused != 0 {
             return Err("expected unused to be 0".into());

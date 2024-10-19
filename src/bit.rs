@@ -19,7 +19,7 @@ impl Bit {
         let len = data.len();
         let mut bytes = vec![0; (len + 7) / 8];
         for (i, v) in data.iter().enumerate() {
-            bytes[i / 8] |= (*v as u8) << (7 - (i % 8));
+            bytes[i / 8] |= u8::from(*v) << (7 - (i % 8));
         }
         Bit { len, data: bytes }
     }
