@@ -81,13 +81,12 @@ impl EmbeddingModel {
         Ok(Self { tokenizer, model })
     }
 
-    // embed one at a time since BertModel does not support attention mask
-    // https://github.com/huggingface/candle/issues/1798
+    // TODO support multiple texts
     fn embed(&self, text: &str) -> Result<Vec<f32>, Box<dyn Error + Send + Sync>> {
         let tokens = self.tokenizer.encode(text, true)?;
         let token_ids = Tensor::new(vec![tokens.get_ids().to_vec()], &self.model.device)?;
         let token_type_ids = token_ids.zeros_like()?;
-        let embeddings = self.model.forward(&token_ids, &token_type_ids)?;
+        let embeddings = self.model.forward(&token_ids, &token_type_ids, None)?;
         let embeddings = (embeddings.sum(1)? / (embeddings.dim(1)? as f64))?;
         let embeddings = embeddings.broadcast_div(&embeddings.sqr()?.sum_keepdim(1)?.sqrt()?)?;
         Ok(embeddings.squeeze(0)?.to_vec1::<f32>()?)
