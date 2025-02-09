@@ -21,6 +21,7 @@ Or check out some examples:
 - [Sentence embeddings](https://github.com/pgvector/pgvector-rust/blob/master/examples/candle/src/main.rs) with Candle
 - [Hybrid search](https://github.com/pgvector/pgvector-rust/blob/master/examples/hybrid_search/src/main.rs) with Candle (Reciprocal Rank Fusion)
 - [Recommendations](https://github.com/pgvector/pgvector-rust/blob/master/examples/disco/src/main.rs) with Disco
+- [Horizontal scaling](https://github.com/pgvector/pgvector-rust/blob/master/examples/citus/src/main.rs) with Citus
 - [Bulk loading](https://github.com/pgvector/pgvector-rust/blob/master/examples/loading/src/main.rs) with `COPY`
 
 ## Rust-Postgres

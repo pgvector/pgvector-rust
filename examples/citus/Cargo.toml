@@ -1,0 +1,13 @@
+[package]
+name = "example"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+pgvector = { path = "../..", features = ["postgres"] }
+postgres = "0.19"
+rand = "0.8"
+
+[profile.dev]
+opt-level = 1
