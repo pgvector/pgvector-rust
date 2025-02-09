@@ -12,7 +12,10 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     client.execute("CREATE EXTENSION IF NOT EXISTS vector", &[])?;
     client.execute("DROP TABLE IF EXISTS documents", &[])?;
-    client.execute("CREATE TABLE documents (id serial PRIMARY KEY, content text, embedding bit(1024))", &[])?;
+    client.execute(
+        "CREATE TABLE documents (id serial PRIMARY KEY, content text, embedding bit(1024))",
+        &[],
+    )?;
 
     let input = [
         "The dog is barking",
@@ -22,12 +25,18 @@ fn main() -> Result<(), Box<dyn Error>> {
     let embeddings = fetch_embeddings(&input, "search_document")?;
     for (content, embedding) in input.iter().zip(embeddings) {
         let embedding = Bit::from_bytes(&embedding);
-        client.execute("INSERT INTO documents (content, embedding) VALUES ($1, $2)", &[&content, &embedding])?;
+        client.execute(
+            "INSERT INTO documents (content, embedding) VALUES ($1, $2)",
+            &[&content, &embedding],
+        )?;
     }
 
     let query = "forest";
     let query_embedding = fetch_embeddings(&[query], "search_query")?;
-    for row in client.query("SELECT content FROM documents ORDER BY embedding <~> $1 LIMIT 5", &[&Bit::from_bytes(&query_embedding[0])])? {
+    for row in client.query(
+        "SELECT content FROM documents ORDER BY embedding <~> $1 LIMIT 5",
+        &[&Bit::from_bytes(&query_embedding[0])],
+    )? {
         let content: &str = row.get(0);
         println!("{}", content);
     }
