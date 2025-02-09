@@ -39,14 +39,15 @@ fn fetch_embeddings(texts: &[&str], input_type: &str) -> Result<Vec<Vec<u8>>, Bo
     let api_key = std::env::var("CO_API_KEY").or(Err("Set CO_API_KEY"))?;
 
     let response: Value = ureq::post("https://api.cohere.com/v1/embed")
-        .set("Authorization", &format!("Bearer {}", api_key))
-        .send_json(ureq::json!({
+        .header("Authorization", &format!("Bearer {}", api_key))
+        .send_json(serde_json::json!({
             "texts": texts,
             "model": "embed-english-v3.0",
             "input_type": input_type,
             "embedding_types": &["ubinary"],
         }))?
-        .into_json()?;
+        .body_mut()
+        .read_json()?;
 
     let embeddings = response["embeddings"]["ubinary"]
         .as_array()
