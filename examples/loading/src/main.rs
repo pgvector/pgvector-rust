@@ -10,9 +10,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     // generate random data
     let rows = 1000000;
     let dimensions = 128;
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     let embeddings: Vec<Vec<f32>> = (0..rows)
-        .map(|_| (0..dimensions).map(|_| rng.gen()).collect())
+        .map(|_| (0..dimensions).map(|_| rng.random()).collect())
         .collect();
 
     // enable extension
@@ -32,7 +32,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     // load data
     println!("Loading {} rows", embeddings.len());
-    let vector_type = vector_type(&mut client)?;
+    let vector_type = get_type(&mut client, "vector")?;
     let writer = client.copy_in("COPY items (embedding) FROM STDIN WITH (FORMAT BINARY)")?;
     let mut writer = BinaryCopyInWriter::new(writer, &[vector_type]);
     for (i, embedding) in embeddings.into_iter().enumerate() {
@@ -64,10 +64,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn vector_type(client: &mut Client) -> Result<Type, Box<dyn Error>> {
-    let row = client.query_one("SELECT pg_type.oid, nspname AS schema FROM pg_type INNER JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace WHERE typname = 'vector'", &[])?;
+fn get_type(client: &mut Client, name: &str) -> Result<Type, Box<dyn Error>> {
+    let row = client.query_one("SELECT pg_type.oid, nspname AS schema FROM pg_type INNER JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace WHERE typname = $1", &[&name])?;
     Ok(Type::new(
-        "vector".into(),
+        name.into(),
         row.get("oid"),
         Kind::Simple,
         row.get("schema"),

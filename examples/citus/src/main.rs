@@ -9,13 +9,13 @@ fn main() -> Result<(), Box<dyn Error>> {
     // generate random data
     let rows = 100000;
     let dimensions = 128;
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     let embeddings: Vec<Vec<f32>> = (0..rows)
-        .map(|_| (0..dimensions).map(|_| rng.gen()).collect())
+        .map(|_| (0..dimensions).map(|_| rng.random()).collect())
         .collect();
-    let categories: Vec<i64> = (0..rows).map(|_| rng.gen_range(1..=100)).collect();
+    let categories: Vec<i64> = (0..rows).map(|_| rng.random_range(1..=100)).collect();
     let queries: Vec<Vec<f32>> = (0..10)
-        .map(|_| (0..dimensions).map(|_| rng.gen()).collect())
+        .map(|_| (0..dimensions).map(|_| rng.random()).collect())
         .collect();
 
     // enable extensions
