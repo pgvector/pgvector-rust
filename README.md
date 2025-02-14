@@ -290,6 +290,7 @@ Note: Use the `halfvec` feature to enable half vectors
 Create a half vector
 
 ```rust
+use half::f16;
 use pgvector::HalfVector;
 
 let vec = HalfVector::from(vec![f16::from_f32(1.0), f16::from_f32(2.0), f16::from_f32(3.0)]);
