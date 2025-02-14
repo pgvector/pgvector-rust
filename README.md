@@ -259,13 +259,19 @@ Use `vector_ip_ops` for inner product and `vector_cosine_ops` for cosine distanc
 
 Use the `serde` feature to enable serialization
 
-## Half Vectors
-
-Use the `halfvec` feature to enable half vectors
-
 ## Reference
 
-Convert a vector to a `Vec<f32>`
+### Vectors
+
+Create a vector
+
+```rust
+use pgvector::Vector;
+
+let vec = Vector::from(vec![1.0, 2.0, 3.0]);
+```
+
+Convert to a `Vec<f32>`
 
 ```rust
 let f32_vec: Vec<f32> = vec.into();
@@ -275,6 +281,101 @@ Get a slice
 
 ```rust
 let slice = vec.as_slice();
+```
+
+### Half Vectors
+
+Note: Use the `halfvec` feature to enable half vectors
+
+Create a half vector
+
+```rust
+use pgvector::HalfVector;
+
+let vec = HalfVector::from(vec![f16::from_f32(1.0), f16::from_f32(2.0), f16::from_f32(3.0)]);
+```
+
+Convert to a `Vec<f16>`
+
+```rust
+let f16_vec: Vec<f16> = vec.into();
+```
+
+Get a slice
+
+```rust
+let slice = vec.as_slice();
+```
+
+### Binary Vectors
+
+Create a binary vector from a slice of bits
+
+```rust
+use pgvector::Bit;
+
+let vec = Bit::new(&[true, false, true]);
+```
+
+or a slice of bytes
+
+```rust
+let vec = Bit::from_bytes(&[0b00000000, 0b11111111]);
+```
+
+Get the number of bits
+
+```rust
+let len = vec.len();
+```
+
+Get a slice of bytes
+
+```rust
+let bytes = vec.as_bytes();
+```
+
+### Sparse Vectors
+
+Create a sparse vector from a dense vector
+
+```rust
+use pgvector::SparseVector;
+
+let vec = SparseVector::from_dense(vec![1.0, 0.0, 2.0, 0.0, 3.0, 0.0]);
+```
+
+or a map of non-zero elements
+
+```rust
+let map = HashMap::from([(0, 1.0), (2, 2.0), (4, 3.0)]);
+let vec = SparseVector::from_map(&map, 6);
+```
+
+Note: Indices start at 0
+
+Get the number of dimensions
+
+```rust
+let dim = vec.dimensions();
+```
+
+Get the indices of non-zero elements
+
+```rust
+let indices = vec.indices();
+```
+
+Get the values of non-zero elements
+
+```rust
+let values = vec.values();
+```
+
+Get a dense vector
+
+```rust
+let f32_vec = vec.to_vec();
 ```
 
 ## History
