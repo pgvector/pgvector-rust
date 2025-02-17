@@ -22,7 +22,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         "The cat is purring",
         "The bear is growling",
     ];
-    let embeddings = fetch_embeddings(&input, "search_document")?;
+    let embeddings = embed(&input, "search_document")?;
     for (content, embedding) in input.iter().zip(embeddings) {
         let embedding = Bit::from_bytes(&embedding);
         client.execute(
@@ -32,7 +32,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 
     let query = "forest";
-    let query_embedding = fetch_embeddings(&[query], "search_query")?;
+    let query_embedding = embed(&[query], "search_query")?;
     for row in client.query(
         "SELECT content FROM documents ORDER BY embedding <~> $1 LIMIT 5",
         &[&Bit::from_bytes(&query_embedding[0])],
@@ -44,7 +44,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn fetch_embeddings(texts: &[&str], input_type: &str) -> Result<Vec<Vec<u8>>, Box<dyn Error>> {
+fn embed(texts: &[&str], input_type: &str) -> Result<Vec<Vec<u8>>, Box<dyn Error>> {
     let api_key = std::env::var("CO_API_KEY").or(Err("Set CO_API_KEY"))?;
 
     let response: Value = ureq::post("https://api.cohere.com/v1/embed")

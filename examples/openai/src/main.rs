@@ -22,18 +22,20 @@ fn main() -> Result<(), Box<dyn Error>> {
         "The cat is purring",
         "The bear is growling",
     ];
-    let embeddings = fetch_embeddings(&input)?;
-
+    let embeddings = embed(&input)?;
     for (content, embedding) in input.iter().zip(embeddings) {
-        let embedding = Vector::from(embedding);
         client.execute(
             "INSERT INTO documents (content, embedding) VALUES ($1, $2)",
-            &[&content, &embedding],
+            &[&content, &Vector::from(embedding)],
         )?;
     }
 
-    let document_id = 2;
-    for row in client.query("SELECT content FROM documents WHERE id != $1 ORDER BY embedding <=> (SELECT embedding FROM documents WHERE id = $1) LIMIT 5", &[&document_id])? {
+    let query = "forest";
+    let query_embedding = embed(&[query])?.drain(..).next().unwrap();
+    for row in client.query(
+        "SELECT content FROM documents ORDER BY embedding <=> $1 LIMIT 5",
+        &[&Vector::from(query_embedding)],
+    )? {
         let content: &str = row.get(0);
         println!("{}", content);
     }
@@ -41,7 +43,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn fetch_embeddings(input: &[&str]) -> Result<Vec<Vec<f32>>, Box<dyn Error>> {
+fn embed(input: &[&str]) -> Result<Vec<Vec<f32>>, Box<dyn Error>> {
     let api_key = std::env::var("OPENAI_API_KEY").or(Err("Set OPENAI_API_KEY"))?;
 
     let response: Value = ureq::post("https://api.openai.com/v1/embeddings")
