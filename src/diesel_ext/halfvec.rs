@@ -36,7 +36,6 @@ impl FromSql<HalfVectorType, Pg> for HalfVector {
 mod tests {
     use crate::{HalfVector, VectorExpressionMethods};
     use diesel::prelude::*;
-    use half::f16;
 
     table! {
         use diesel::sql_types::*;
@@ -74,25 +73,13 @@ mod tests {
 
         let new_items = vec![
             NewItem {
-                embedding: Some(HalfVector::from(vec![
-                    f16::from_f32(1.0),
-                    f16::from_f32(1.0),
-                    f16::from_f32(1.0),
-                ])),
+                embedding: Some(HalfVector::from_slice(&[1.0, 1.0, 1.0])),
             },
             NewItem {
-                embedding: Some(HalfVector::from(vec![
-                    f16::from_f32(2.0),
-                    f16::from_f32(2.0),
-                    f16::from_f32(2.0),
-                ])),
+                embedding: Some(HalfVector::from_slice(&[2.0, 2.0, 2.0])),
             },
             NewItem {
-                embedding: Some(HalfVector::from(vec![
-                    f16::from_f32(1.0),
-                    f16::from_f32(1.0),
-                    f16::from_f32(2.0),
-                ])),
+                embedding: Some(HalfVector::from_slice(&[1.0, 1.0, 2.0])),
             },
             NewItem { embedding: None },
         ];
@@ -105,11 +92,7 @@ mod tests {
         assert_eq!(4, all.len());
 
         let neighbors = items::table
-            .order(items::embedding.l2_distance(HalfVector::from(vec![
-                f16::from_f32(1.0),
-                f16::from_f32(1.0),
-                f16::from_f32(1.0),
-            ])))
+            .order(items::embedding.l2_distance(HalfVector::from_slice(&[1.0, 1.0, 1.0])))
             .limit(5)
             .load::<Item>(&mut conn)?;
         assert_eq!(
@@ -117,20 +100,12 @@ mod tests {
             neighbors.iter().map(|v| v.id).collect::<Vec<i32>>()
         );
         assert_eq!(
-            Some(HalfVector::from(vec![
-                f16::from_f32(1.0),
-                f16::from_f32(1.0),
-                f16::from_f32(1.0)
-            ])),
+            Some(HalfVector::from_slice(&[1.0, 1.0, 1.0])),
             neighbors.first().unwrap().embedding
         );
 
         let neighbors = items::table
-            .order(items::embedding.max_inner_product(HalfVector::from(vec![
-                f16::from_f32(1.0),
-                f16::from_f32(1.0),
-                f16::from_f32(1.0),
-            ])))
+            .order(items::embedding.max_inner_product(HalfVector::from_slice(&[1.0, 1.0, 1.0])))
             .limit(5)
             .load::<Item>(&mut conn)?;
         assert_eq!(
@@ -139,11 +114,7 @@ mod tests {
         );
 
         let neighbors = items::table
-            .order(items::embedding.cosine_distance(HalfVector::from(vec![
-                f16::from_f32(1.0),
-                f16::from_f32(1.0),
-                f16::from_f32(1.0),
-            ])))
+            .order(items::embedding.cosine_distance(HalfVector::from_slice(&[1.0, 1.0, 1.0])))
             .limit(5)
             .load::<Item>(&mut conn)?;
         assert_eq!(
@@ -152,11 +123,7 @@ mod tests {
         );
 
         let neighbors = items::table
-            .order(items::embedding.l1_distance(HalfVector::from(vec![
-                f16::from_f32(1.0),
-                f16::from_f32(1.0),
-                f16::from_f32(1.0),
-            ])))
+            .order(items::embedding.l1_distance(HalfVector::from_slice(&[1.0, 1.0, 1.0])))
             .limit(5)
             .load::<Item>(&mut conn)?;
         assert_eq!(
@@ -165,11 +132,7 @@ mod tests {
         );
 
         let distances = items::table
-            .select(items::embedding.max_inner_product(HalfVector::from(vec![
-                f16::from_f32(1.0),
-                f16::from_f32(1.0),
-                f16::from_f32(1.0),
-            ])))
+            .select(items::embedding.max_inner_product(HalfVector::from_slice(&[1.0, 1.0, 1.0])))
             .order(items::id)
             .load::<Option<f64>>(&mut conn)?;
         assert_eq!(vec![Some(-3.0), Some(-6.0), Some(-4.0), None], distances);

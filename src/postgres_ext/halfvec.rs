@@ -59,26 +59,14 @@ mod tests {
             &[],
         )?;
 
-        let vec = HalfVector::from(vec![
-            f16::from_f32(1.0),
-            f16::from_f32(2.0),
-            f16::from_f32(3.0),
-        ]);
-        let vec2 = HalfVector::from(vec![
-            f16::from_f32(4.0),
-            f16::from_f32(5.0),
-            f16::from_f32(6.0),
-        ]);
+        let vec = HalfVector::from_slice(&[1.0, 2.0, 3.0]);
+        let vec2 = HalfVector::from_slice(&[4.0, 5.0, 6.0]);
         client.execute(
             "INSERT INTO postgres_half_items (embedding) VALUES ($1), ($2), (NULL)",
             &[&vec, &vec2],
         )?;
 
-        let query_vec = HalfVector::from(vec![
-            f16::from_f32(3.0),
-            f16::from_f32(1.0),
-            f16::from_f32(2.0),
-        ]);
+        let query_vec = HalfVector::from_slice(&[3.0, 1.0, 2.0]);
         let row = client.query_one(
             "SELECT embedding FROM postgres_half_items ORDER BY embedding <-> $1 LIMIT 1",
             &[&query_vec],

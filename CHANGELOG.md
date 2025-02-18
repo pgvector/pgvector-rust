@@ -1,3 +1,7 @@
+## 0.4.1 (unreleased)
+
+- Added `from_slice` function to `HalfVector`
+
 ## 0.4.0 (2024-07-28)
 
 - Added support for SQLx 0.8
