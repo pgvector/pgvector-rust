@@ -296,7 +296,7 @@ use pgvector::HalfVector;
 let vec = HalfVector::from(vec![f16::from_f32(1.0), f16::from_f32(2.0), f16::from_f32(3.0)]);
 ```
 
-or a `f32` slice [unreleased]
+Or a `f32` slice [unreleased]
 
 ```rust
 let vec = HalfVector::from_f32_slice(&[1.0, 2.0, 3.0]);
@@ -324,7 +324,7 @@ use pgvector::Bit;
 let vec = Bit::new(&[true, false, true]);
 ```
 
-or a slice of bytes
+Or a slice of bytes
 
 ```rust
 let vec = Bit::from_bytes(&[0b00000000, 0b11111111]);
@@ -352,7 +352,7 @@ use pgvector::SparseVector;
 let vec = SparseVector::from_dense(vec![1.0, 0.0, 2.0, 0.0, 3.0, 0.0]);
 ```
 
-or a map of non-zero elements
+Or a map of non-zero elements
 
 ```rust
 let map = HashMap::from([(0, 1.0), (2, 2.0), (4, 3.0)]);
