@@ -25,6 +25,11 @@ impl From<HalfVector> for Vec<f16> {
 }
 
 impl HalfVector {
+    /// Creates a half vector from a `f32` slice.
+    pub fn from_f32_slice(slice: &[f32]) -> HalfVector {
+        HalfVector(slice.iter().map(|v| f16::from_f32(*v)).collect())
+    }
+
     /// Returns a copy of the half vector as a `Vec<f16>`.
     pub fn to_vec(&self) -> Vec<f16> {
         self.0.clone()
@@ -76,11 +81,7 @@ mod tests {
 
     #[test]
     fn test_to_vec() {
-        let vec = HalfVector::from(vec![
-            f16::from_f32(1.0),
-            f16::from_f32(2.0),
-            f16::from_f32(3.0),
-        ]);
+        let vec = HalfVector::from_f32_slice(&[1.0, 2.0, 3.0]);
         assert_eq!(
             vec.to_vec(),
             vec![f16::from_f32(1.0), f16::from_f32(2.0), f16::from_f32(3.0)]
@@ -89,11 +90,7 @@ mod tests {
 
     #[test]
     fn test_as_slice() {
-        let vec = HalfVector::from(vec![
-            f16::from_f32(1.0),
-            f16::from_f32(2.0),
-            f16::from_f32(3.0),
-        ]);
+        let vec = HalfVector::from_f32_slice(&[1.0, 2.0, 3.0]);
         assert_eq!(
             vec.as_slice(),
             &[f16::from_f32(1.0), f16::from_f32(2.0), f16::from_f32(3.0)]

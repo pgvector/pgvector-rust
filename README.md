@@ -287,13 +287,19 @@ let slice = vec.as_slice();
 
 Note: Use the `halfvec` feature to enable half vectors
 
-Create a half vector
+Create a half vector from a `Vec<f16>`
 
 ```rust
 use half::f16;
 use pgvector::HalfVector;
 
 let vec = HalfVector::from(vec![f16::from_f32(1.0), f16::from_f32(2.0), f16::from_f32(3.0)]);
+```
+
+or a `f32` slice [unreleased]
+
+```rust
+let vec = HalfVector::from_f32_slice(&[1.0, 2.0, 3.0]);
 ```
 
 Convert to a `Vec<f16>`
