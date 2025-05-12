@@ -30,7 +30,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         &[],
     )?;
 
-    let data = load_movielens(Path::new(&movielens_path));
+    let data = load_movielens(Path::new(&movielens_path))?;
     let recommender = RecommenderBuilder::new().factors(20).fit_explicit(&data);
 
     for user_id in recommender.user_ids() {
@@ -66,37 +66,37 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn load_movielens(path: &Path) -> Dataset<i32, String> {
+fn load_movielens(path: &Path) -> Result<Dataset<i32, String>, Box<dyn Error>> {
     // read movies, removing invalid UTF-8 bytes
     let mut movies = HashMap::new();
-    let mut movies_file = File::open(path.join("u.item")).unwrap();
+    let mut movies_file = File::open(path.join("u.item"))?;
     let mut buf = Vec::new();
-    movies_file.read_to_end(&mut buf).unwrap();
+    movies_file.read_to_end(&mut buf)?;
     let movies_data = String::from_utf8_lossy(&buf);
     let mut rdr = ReaderBuilder::new()
         .has_headers(false)
         .delimiter(b'|')
         .from_reader(movies_data.as_bytes());
     for record in rdr.records() {
-        let row = record.unwrap();
+        let row = record?;
         movies.insert(row[0].to_string(), row[1].to_string());
     }
 
     // read ratings and create dataset
     let mut data = Dataset::new();
-    let ratings_file = File::open(path.join("u.data")).unwrap();
+    let ratings_file = File::open(path.join("u.data"))?;
     let mut rdr = ReaderBuilder::new()
         .has_headers(false)
         .delimiter(b'\t')
         .from_reader(ratings_file);
     for record in rdr.records() {
-        let row = record.unwrap();
+        let row = record?;
         data.push(
-            row[0].parse::<i32>().unwrap(),
+            row[0].parse::<i32>()?,
             movies.get(&row[1]).unwrap().to_string(),
-            row[2].parse().unwrap(),
+            row[2].parse()?,
         );
     }
 
-    data
+    Ok(data)
 }
