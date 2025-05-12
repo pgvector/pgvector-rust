@@ -1,11 +1,10 @@
-use csv::ReaderBuilder;
 use discorec::{Dataset, RecommenderBuilder};
 use pgvector::Vector;
 use postgres::{Client, NoTls};
 use std::collections::HashMap;
 use std::error::Error;
 use std::fs::File;
-use std::io::Read;
+use std::io::{BufRead, BufReader, Read};
 use std::path::Path;
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -73,27 +72,23 @@ fn load_movielens(path: &Path) -> Result<Dataset<i32, String>, Box<dyn Error>> {
     let mut buf = Vec::new();
     movies_file.read_to_end(&mut buf)?;
     let movies_data = String::from_utf8_lossy(&buf);
-    let mut rdr = ReaderBuilder::new()
-        .has_headers(false)
-        .delimiter(b'|')
-        .from_reader(movies_data.as_bytes());
-    for record in rdr.records() {
-        let row = record?;
+    let rdr = BufReader::new(movies_data.as_bytes());
+    for line in rdr.lines() {
+        let line = line?;
+        let row: Vec<_> = line.split('|').collect();
         movies.insert(row[0].to_string(), row[1].to_string());
     }
 
     // read ratings and create dataset
     let mut data = Dataset::new();
     let ratings_file = File::open(path.join("u.data"))?;
-    let mut rdr = ReaderBuilder::new()
-        .has_headers(false)
-        .delimiter(b'\t')
-        .from_reader(ratings_file);
-    for record in rdr.records() {
-        let row = record?;
+    let rdr = BufReader::new(ratings_file);
+    for line in rdr.lines() {
+        let line = line?;
+        let row: Vec<_> = line.split('\t').collect();
         data.push(
             row[0].parse::<i32>()?,
-            movies.get(&row[1]).unwrap().to_string(),
+            movies.get(row[1]).unwrap().to_string(),
             row[2].parse()?,
         );
     }
