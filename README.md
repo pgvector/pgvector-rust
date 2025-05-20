@@ -296,7 +296,7 @@ use pgvector::HalfVector;
 let vec = HalfVector::from(vec![f16::from_f32(1.0), f16::from_f32(2.0), f16::from_f32(3.0)]);
 ```
 
-Or a `f32` slice [unreleased]
+Or a `f32` slice
 
 ```rust
 let vec = HalfVector::from_f32_slice(&[1.0, 2.0, 3.0]);

@@ -1,4 +1,4 @@
-## 0.4.1 (unreleased)
+## 0.4.1 (2025-05-20)
 
 - Added `from_f32_slice` function to `HalfVector`
 
