@@ -36,13 +36,13 @@ fn main() -> Result<(), Box<dyn Error>> {
     let writer = client.copy_in("COPY items (embedding) FROM STDIN WITH (FORMAT BINARY)")?;
     let mut writer = BinaryCopyInWriter::new(writer, &[vector_type]);
     for (i, embedding) in embeddings.into_iter().enumerate() {
+        writer.write(&[&Vector::from(embedding)])?;
+
         // show progress
         if i % 10000 == 0 {
             print!(".");
             io::stdout().flush()?;
         }
-
-        writer.write(&[&Vector::from(embedding)])?;
     }
     writer.finish()?;
     println!("\nSuccess!");
