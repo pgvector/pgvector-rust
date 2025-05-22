@@ -69,19 +69,14 @@ fn load_movielens(path: &Path) -> Result<Dataset<i32, String>, Box<dyn Error>> {
     // read movies, removing invalid UTF-8 bytes
     let mut movies = HashMap::with_capacity(2000);
     let movies_file = File::open(path.join("u.item"))?;
-    let mut rdr = BufReader::new(movies_file);
-    let mut buf = Vec::new();
-    loop {
-        let bytes_read = rdr.read_until(b'\n', &mut buf)?;
-        if bytes_read == 0 {
-            break;
-        }
-        let line = String::from_utf8_lossy(&buf);
+    let rdr = BufReader::new(movies_file);
+    for line in rdr.split(b'\n') {
+        let line = line?;
+        let line = String::from_utf8_lossy(&line);
         let mut row = line.split('|');
         let id = row.next().unwrap().to_string();
         let name = row.next().unwrap().to_string();
         movies.insert(id, name);
-        buf.clear();
     }
 
     // read ratings and create dataset
