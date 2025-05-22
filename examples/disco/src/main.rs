@@ -66,13 +66,18 @@ fn main() -> Result<(), Box<dyn Error>> {
 }
 
 fn load_movielens(path: &Path) -> Result<Dataset<i32, String>, Box<dyn Error>> {
-    // read movies, removing invalid UTF-8 bytes
+    // read movies
     let mut movies = HashMap::with_capacity(2000);
     let movies_file = File::open(path.join("u.item"))?;
     let rdr = BufReader::new(movies_file);
     for line in rdr.split(b'\n') {
         let line = line?;
-        let line = String::from_utf8_lossy(&line);
+        // convert encoding to UTF-8
+        let line = String::from_utf8(
+            line.into_iter()
+                .flat_map(|v| if v < 128 { vec![v] } else { vec![195, v - 64] })
+                .collect(),
+        )?;
         let mut row = line.split('|');
         let id = row.next().unwrap().to_string();
         let name = row.next().unwrap().to_string();
