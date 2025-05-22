@@ -67,7 +67,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
 fn load_movielens(path: &Path) -> Result<Dataset<i32, String>, Box<dyn Error>> {
     // read movies, removing invalid UTF-8 bytes
-    let mut movies = HashMap::new();
+    let mut movies = HashMap::with_capacity(2000);
     let mut movies_file = File::open(path.join("u.item"))?;
     let mut buf = Vec::new();
     movies_file.read_to_end(&mut buf)?;
@@ -82,15 +82,15 @@ fn load_movielens(path: &Path) -> Result<Dataset<i32, String>, Box<dyn Error>> {
     }
 
     // read ratings and create dataset
-    let mut data = Dataset::new();
+    let mut data = Dataset::with_capacity(100000);
     let ratings_file = File::open(path.join("u.data"))?;
     let rdr = BufReader::new(ratings_file);
     for line in rdr.lines() {
         let line = line?;
         let mut row = line.split('\t');
-        let user_id: i32 = row.next().unwrap().parse()?;
+        let user_id = row.next().unwrap().parse()?;
         let item_id = movies.get(row.next().unwrap()).unwrap().to_string();
-        let rating: f32 = row.next().unwrap().parse()?;
+        let rating = row.next().unwrap().parse()?;
         data.push(user_id, item_id, rating);
     }
 
