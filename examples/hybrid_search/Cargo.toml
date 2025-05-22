@@ -5,9 +5,9 @@ edition = "2021"
 publish = false
 
 [dependencies]
-candle-core = "0.8"
-candle-nn = "0.8"
-candle-transformers = "0.8"
+candle-core = "0.9"
+candle-nn = "0.9"
+candle-transformers = "0.9"
 hf-hub = "0.4"
 pgvector = { path = "../..", features = ["postgres"] }
 postgres = "0.19"
