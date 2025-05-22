@@ -75,8 +75,10 @@ fn load_movielens(path: &Path) -> Result<Dataset<i32, String>, Box<dyn Error>> {
     let rdr = BufReader::new(movies_data.as_bytes());
     for line in rdr.lines() {
         let line = line?;
-        let row: Vec<_> = line.split('|').collect();
-        movies.insert(row[0].to_string(), row[1].to_string());
+        let mut row = line.split('|');
+        let id = row.next().unwrap().to_string();
+        let name = row.next().unwrap().to_string();
+        movies.insert(id, name);
     }
 
     // read ratings and create dataset
@@ -85,12 +87,11 @@ fn load_movielens(path: &Path) -> Result<Dataset<i32, String>, Box<dyn Error>> {
     let rdr = BufReader::new(ratings_file);
     for line in rdr.lines() {
         let line = line?;
-        let row: Vec<_> = line.split('\t').collect();
-        data.push(
-            row[0].parse::<i32>()?,
-            movies.get(row[1]).unwrap().to_string(),
-            row[2].parse()?,
-        );
+        let mut row = line.split('\t');
+        let user_id: i32 = row.next().unwrap().parse()?;
+        let item_id = movies.get(row.next().unwrap()).unwrap().to_string();
+        let rating: f32 = row.next().unwrap().parse()?;
+        data.push(user_id, item_id, rating);
     }
 
     Ok(data)
