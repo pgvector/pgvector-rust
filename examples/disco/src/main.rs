@@ -4,7 +4,7 @@ use postgres::{Client, NoTls};
 use std::collections::HashMap;
 use std::error::Error;
 use std::fs::File;
-use std::io::{BufRead, BufReader, Read};
+use std::io::{BufRead, BufReader};
 use std::path::Path;
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -68,17 +68,19 @@ fn main() -> Result<(), Box<dyn Error>> {
 fn load_movielens(path: &Path) -> Result<Dataset<i32, String>, Box<dyn Error>> {
     // read movies, removing invalid UTF-8 bytes
     let mut movies = HashMap::with_capacity(2000);
-    let mut movies_file = File::open(path.join("u.item"))?;
+    let movies_file = File::open(path.join("u.item"))?;
+    let mut rdr = BufReader::new(movies_file);
     let mut buf = Vec::new();
-    movies_file.read_to_end(&mut buf)?;
-    let movies_data = String::from_utf8_lossy(&buf);
-    let rdr = BufReader::new(movies_data.as_bytes());
-    for line in rdr.lines() {
-        let line = line?;
+    while let Ok(len) = rdr.read_until(b'\n', &mut buf) {
+        if len == 0 {
+            break;
+        }
+        let line = String::from_utf8_lossy(&buf);
         let mut row = line.split('|');
         let id = row.next().unwrap().to_string();
         let name = row.next().unwrap().to_string();
         movies.insert(id, name);
+        buf.clear();
     }
 
     // read ratings and create dataset
