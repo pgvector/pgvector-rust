@@ -71,7 +71,8 @@ fn load_movielens(path: &Path) -> Result<Dataset<i32, String>, Box<dyn Error>> {
     let movies_file = File::open(path.join("u.item"))?;
     let mut rdr = BufReader::new(movies_file);
     let mut buf = Vec::new();
-    while let Ok(bytes_read) = rdr.read_until(b'\n', &mut buf) {
+    loop {
+        let bytes_read = rdr.read_until(b'\n', &mut buf)?;
         if bytes_read == 0 {
             break;
         }
