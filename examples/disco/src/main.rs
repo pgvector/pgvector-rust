@@ -6,6 +6,7 @@ use std::error::Error;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
+use std::string::FromUtf8Error;
 
 fn main() -> Result<(), Box<dyn Error>> {
     // https://grouplens.org/datasets/movielens/100k/
@@ -72,12 +73,7 @@ fn load_movielens(path: &Path) -> Result<Dataset<i32, String>, Box<dyn Error>> {
     let rdr = BufReader::new(movies_file);
     for line in rdr.split(b'\n') {
         let line = line?;
-        // convert encoding to UTF-8
-        let line = String::from_utf8(
-            line.into_iter()
-                .flat_map(|v| if v < 128 { vec![v] } else { vec![195, v - 64] })
-                .collect(),
-        )?;
+        let line = convert_to_utf8(&line)?;
         let mut row = line.split('|');
         let id = row.next().unwrap().to_string();
         let name = row.next().unwrap().to_string();
@@ -98,4 +94,18 @@ fn load_movielens(path: &Path) -> Result<Dataset<i32, String>, Box<dyn Error>> {
     }
 
     Ok(data)
+}
+
+// ISO-8859-1 to UTF-8
+fn convert_to_utf8(s: &[u8]) -> Result<String, FromUtf8Error> {
+    let mut buf = Vec::with_capacity(s.len() + 10);
+    for v in s {
+        if *v < 128 {
+            buf.push(*v);
+        } else {
+            buf.push(195);
+            buf.push(*v - 64);
+        }
+    }
+    String::from_utf8(buf)
 }
