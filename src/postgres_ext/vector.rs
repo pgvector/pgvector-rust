@@ -80,10 +80,10 @@ mod tests {
             &[&empty_vec],
         );
         assert!(empty_res.is_err());
-        assert!(empty_res
-            .unwrap_err()
-            .to_string()
-            .contains("vector must have at least 1 dimension"));
+        assert_eq!(
+            empty_res.unwrap_err().as_db_error().unwrap().message(),
+            "vector must have at least 1 dimension"
+        );
 
         let null_row = client.query_one(
             "SELECT embedding FROM postgres_items WHERE embedding IS NULL LIMIT 1",
