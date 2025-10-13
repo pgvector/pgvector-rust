@@ -51,7 +51,7 @@ mod tests {
     use sqlx::postgres::PgPoolOptions;
     use sqlx::Row;
 
-    #[async_std::test]
+    #[tokio::test]
     async fn it_works() -> Result<(), sqlx::Error> {
         let pool = PgPoolOptions::new()
             .max_connections(1)

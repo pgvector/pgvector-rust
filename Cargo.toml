@@ -23,8 +23,8 @@ half = { version = "2", default-features = false, optional = true }
 [dev-dependencies]
 postgres = { version = "0.19", default-features = false }
 diesel = { version = "2", default-features = false, features = ["32-column-tables"] }
-sqlx = { version = "0", default-features = false, features = ["runtime-async-std-native-tls"] }
-async-std = { version = "1", features = ["attributes"] }
+sqlx = { version = "0", default-features = false, features = ["runtime-tokio", "tls-native-tls"] }
+tokio = { version = "1", features = ["full"] }
 serde_json = "1"
 
 [features]
