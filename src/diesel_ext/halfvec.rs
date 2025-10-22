@@ -1,8 +1,10 @@
 use diesel::deserialize::{self, FromSql};
+use diesel::expression::{AppearsOnTable, Expression, SelectableExpression, ValidGrouping};
 use diesel::pg::{Pg, PgValue};
-use diesel::query_builder::QueryId;
+use diesel::query_builder::{AstPass, QueryFragment, QueryId};
 use diesel::serialize::{self, IsNull, Output, ToSql};
 use diesel::sql_types::SqlType;
+use diesel::QueryResult;
 use std::convert::TryFrom;
 use std::io::Write;
 
@@ -31,6 +33,42 @@ impl FromSql<HalfVectorType, Pg> for HalfVector {
         HalfVector::from_sql(value.as_bytes())
     }
 }
+
+#[derive(Debug, Clone, Copy, QueryId, ValidGrouping)]
+pub struct HalfVecCast<Expr> {
+    pub expr: Expr,
+    pub dim: usize,
+}
+
+impl<Expr> HalfVecCast<Expr> {
+    pub fn new(expr: Expr, dim: usize) -> Self {
+        Self { expr, dim }
+    }
+}
+
+impl<Expr> Expression for HalfVecCast<Expr>
+where
+    Expr: Expression,
+{
+    type SqlType = HalfVectorType;
+}
+
+impl<Expr> QueryFragment<Pg> for HalfVecCast<Expr>
+where
+    Expr: QueryFragment<Pg>,
+{
+    fn walk_ast<'b>(&'b self, mut out: AstPass<'_, 'b, Pg>) -> QueryResult<()> {
+        out.push_sql("(");
+        self.expr.walk_ast(out.reborrow())?;
+        out.push_sql(")::halfvec(");
+        out.push_sql(&self.dim.to_string());
+        out.push_sql(")");
+        Ok(())
+    }
+}
+
+impl<Expr, QS> AppearsOnTable<QS> for HalfVecCast<Expr> where Expr: AppearsOnTable<QS> {}
+impl<Expr, QS> SelectableExpression<QS> for HalfVecCast<Expr> where Expr: SelectableExpression<QS> {}
 
 #[cfg(test)]
 mod tests {

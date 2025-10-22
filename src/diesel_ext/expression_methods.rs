@@ -2,6 +2,9 @@ use diesel::expression::{AsExpression, Expression};
 use diesel::pg::Pg;
 use diesel::sql_types::{Double, SqlType};
 
+#[cfg(feature = "halfvec")]
+use crate::diesel_ext::halfvec::HalfVecCast;
+
 diesel::infix_operator!(L2Distance, " <-> ", Double, backend: Pg);
 diesel::infix_operator!(MaxInnerProduct, " <#> ", Double, backend: Pg);
 diesel::infix_operator!(CosineDistance, " <=> ", Double, backend: Pg);
@@ -10,6 +13,11 @@ diesel::infix_operator!(HammingDistance, " <~> ", Double, backend: Pg);
 diesel::infix_operator!(JaccardDistance, " <%> ", Double, backend: Pg);
 
 pub trait VectorExpressionMethods: Expression + Sized {
+    #[cfg(feature = "halfvec")]
+    fn cast_to_halfvec(self, dim: usize) -> HalfVecCast<Self> {
+        HalfVecCast::new(self, dim)
+    }
+
     fn l2_distance<T>(self, other: T) -> L2Distance<Self, T::Expression>
     where
         Self::SqlType: SqlType,
