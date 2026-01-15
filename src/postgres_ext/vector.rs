@@ -124,8 +124,11 @@ mod tests {
 
     #[tokio::test]
     async fn tokio_works() -> Result<(), tokio_postgres::Error> {
-        let (client, connection) =
-            tokio_postgres::connect("host=localhost dbname=pgvector_rust_test", tokio_postgres::NoTls).await?;
+        let (client, connection) = tokio_postgres::connect(
+            "host=localhost dbname=pgvector_rust_test",
+            tokio_postgres::NoTls,
+        )
+        .await?;
 
         tokio::spawn(async move {
             if let Err(e) = connection.await {
@@ -133,25 +136,35 @@ mod tests {
             }
         });
 
-        client.execute("CREATE EXTENSION IF NOT EXISTS vector", &[]).await?;
-        client.execute("DROP TABLE IF EXISTS tokio_postgres_items", &[]).await?;
-        client.execute(
-            "CREATE TABLE tokio_postgres_items (id bigserial PRIMARY KEY, embedding vector(3))",
-            &[],
-        ).await?;
+        client
+            .execute("CREATE EXTENSION IF NOT EXISTS vector", &[])
+            .await?;
+        client
+            .execute("DROP TABLE IF EXISTS tokio_postgres_items", &[])
+            .await?;
+        client
+            .execute(
+                "CREATE TABLE tokio_postgres_items (id bigserial PRIMARY KEY, embedding vector(3))",
+                &[],
+            )
+            .await?;
 
         let vec = Vector::from(vec![1.0, 2.0, 3.0]);
         let vec2 = Vector::from(vec![4.0, 5.0, 6.0]);
-        client.execute(
-            "INSERT INTO tokio_postgres_items (embedding) VALUES ($1), ($2), (NULL)",
-            &[&vec, &vec2],
-        ).await?;
+        client
+            .execute(
+                "INSERT INTO tokio_postgres_items (embedding) VALUES ($1), ($2), (NULL)",
+                &[&vec, &vec2],
+            )
+            .await?;
 
         let query_vec = Vector::from(vec![3.0, 1.0, 2.0]);
-        let row = client.query_one(
-            "SELECT embedding FROM tokio_postgres_items ORDER BY embedding <-> $1 LIMIT 1",
-            &[&query_vec],
-        ).await?;
+        let row = client
+            .query_one(
+                "SELECT embedding FROM tokio_postgres_items ORDER BY embedding <-> $1 LIMIT 1",
+                &[&query_vec],
+            )
+            .await?;
         let res_vec: Vector = row.get(0);
         assert_eq!(vec, res_vec);
         assert_eq!(vec![1.0, 2.0, 3.0], res_vec.to_vec());
