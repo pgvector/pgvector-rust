@@ -5,7 +5,7 @@ edition = "2021"
 publish = false
 
 [dependencies]
-discorec = "0.2"
+discorec = "0.3"
 pgvector = { path = "../..", features = ["postgres"] }
 postgres = "0.19"
 

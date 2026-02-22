@@ -1,4 +1,4 @@
-use discorec::{Dataset, RecommenderBuilder};
+use discorec::RecommenderBuilder;
 use pgvector::Vector;
 use postgres::{Client, NoTls};
 use std::collections::HashMap;
@@ -66,7 +66,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn load_movielens(path: &Path) -> Result<Dataset<i32, String>, Box<dyn Error>> {
+#[allow(clippy::type_complexity)]
+fn load_movielens(path: &Path) -> Result<Vec<(i32, String, f32)>, Box<dyn Error>> {
     // read movies
     let mut movies = HashMap::with_capacity(2000);
     let movies_file = File::open(path.join("u.item"))?;
@@ -81,7 +82,7 @@ fn load_movielens(path: &Path) -> Result<Dataset<i32, String>, Box<dyn Error>> {
     }
 
     // read ratings and create dataset
-    let mut data = Dataset::with_capacity(100000);
+    let mut data = Vec::with_capacity(100000);
     let ratings_file = File::open(path.join("u.data"))?;
     let rdr = BufReader::new(ratings_file);
     for line in rdr.lines() {
@@ -90,7 +91,7 @@ fn load_movielens(path: &Path) -> Result<Dataset<i32, String>, Box<dyn Error>> {
         let user_id = row.next().unwrap().parse()?;
         let item_id = movies.get(row.next().unwrap()).unwrap().to_string();
         let rating = row.next().unwrap().parse()?;
-        data.push(user_id, item_id, rating);
+        data.push((user_id, item_id, rating));
     }
 
     Ok(data)
