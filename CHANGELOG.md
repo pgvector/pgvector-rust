@@ -1,4 +1,4 @@
-## 0.4.2 (unreleased)
+## 0.4.2 (2026-05-22)
 
 - Added support for SQLx 0.9
 
