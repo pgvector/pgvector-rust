@@ -38,7 +38,6 @@ impl ToSql for HalfVector {
 #[cfg(test)]
 mod tests {
     use crate::HalfVector;
-    use half::f16;
     use postgres::binary_copy::BinaryCopyInWriter;
     use postgres::types::{Kind, Type};
     use postgres::{Client, NoTls};
@@ -74,7 +73,7 @@ mod tests {
         let res_vec: HalfVector = row.get(0);
         assert_eq!(vec, res_vec);
         assert_eq!(
-            vec![f16::from_f32(1.0), f16::from_f32(2.0), f16::from_f32(3.0)],
+            vec![1.0, 2.0, 3.0],
             res_vec.to_vec()
         );
 
@@ -110,14 +109,14 @@ mod tests {
             .copy_in("COPY postgres_half_items (embedding) FROM STDIN WITH (FORMAT BINARY)")?;
         let mut writer = BinaryCopyInWriter::new(writer, &[halfvec_type]);
         writer.write(&[&HalfVector::from(vec![
-            f16::from_f32(1.0),
-            f16::from_f32(2.0),
-            f16::from_f32(3.0),
+            1.0,
+            2.0,
+            3.0,
         ])])?;
         writer.write(&[&HalfVector::from(vec![
-            f16::from_f32(4.0),
-            f16::from_f32(5.0),
-            f16::from_f32(6.0),
+            4.0,
+            5.0,
+            6.0,
         ])])?;
         writer.finish()?;
 

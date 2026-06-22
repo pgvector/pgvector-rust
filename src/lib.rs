@@ -1,4 +1,5 @@
 #![doc = include_str!("../README.md")]
+#![cfg_attr(feature = "halfvec", feature(f16))]
 
 mod bit;
 mod sparsevec;

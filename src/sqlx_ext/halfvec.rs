@@ -42,7 +42,6 @@ impl PgHasArrayType for HalfVector {
 #[cfg(test)]
 mod tests {
     use crate::HalfVector;
-    use half::f16;
     use sqlx::postgres::PgPoolOptions;
     use sqlx::Row;
 
@@ -82,7 +81,7 @@ mod tests {
         let res_vec: HalfVector = row.try_get("embedding").unwrap();
         assert_eq!(vec, res_vec);
         assert_eq!(
-            vec![f16::from_f32(1.0), f16::from_f32(2.0), f16::from_f32(3.0)],
+            vec![1.0, 2.0, 3.0],
             res_vec.to_vec()
         );
 
