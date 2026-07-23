@@ -59,7 +59,7 @@ impl Bit {
             return Err("invalid length".into());
         }
 
-        let data = buf[4..].to_vec();
+        let data = buf[4..4 + (len + 7) / 8].to_vec();
 
         Ok(Bit { len, data })
     }
