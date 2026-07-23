@@ -55,7 +55,7 @@ impl Bit {
 
         let len = i32::from_be_bytes(buf[0..4].try_into()?).try_into()?;
 
-        if buf.len() - 4 != len / 8 + i32::from(len % 8 != 0) {
+        if buf.len() - 4 != len / 8 + usize::from(len % 8 != 0) {
             return Err("invalid length".into());
         }
 
