@@ -59,8 +59,9 @@ impl HalfVector {
         }
 
         let mut vec = Vec::with_capacity(dim);
-        for v in buf[4..].chunks_exact(2) {
-            vec.push(f16::from_be_bytes(v.try_into()?));
+        for i in 0..dim {
+            let s = 4 + 2 * i;
+            vec.push(f16::from_be_bytes(buf[s..s + 2].try_into()?));
         }
 
         Ok(HalfVector(vec))

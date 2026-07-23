@@ -96,13 +96,15 @@ impl SparseVector {
         }
 
         let mut indices = Vec::with_capacity(nnz);
-        for v in buf[12..12 + 4 * nnz].chunks_exact(4) {
-            indices.push(i32::from_be_bytes(v.try_into()?));
+        for i in 0..nnz {
+            let s = 12 + 4 * i;
+            indices.push(i32::from_be_bytes(buf[s..s + 4].try_into()?));
         }
 
         let mut values = Vec::with_capacity(nnz);
-        for v in buf[12 + 4 * nnz..].chunks_exact(4) {
-            values.push(f32::from_be_bytes(v.try_into()?));
+        for i in 0..nnz {
+            let s = 12 + 4 * nnz + 4 * i;
+            values.push(f32::from_be_bytes(buf[s..s + 4].try_into()?));
         }
 
         Ok(SparseVector {
