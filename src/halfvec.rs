@@ -44,10 +44,18 @@ impl HalfVector {
     pub(crate) fn from_sql(
         buf: &[u8],
     ) -> Result<HalfVector, Box<dyn std::error::Error + Sync + Send>> {
+        if buf.len() < 4 {
+            return Err("invalid length".into());
+        }
+
         let dim = u16::from_be_bytes(buf[0..2].try_into()?).into();
         let unused = u16::from_be_bytes(buf[2..4].try_into()?);
         if unused != 0 {
             return Err("expected unused to be 0".into());
+        }
+
+        if (buf.len() - 4) / 2 != dim || buf.len() % 2 != 0 {
+            return Err("invalid length".into());
         }
 
         let mut vec = Vec::with_capacity(dim);

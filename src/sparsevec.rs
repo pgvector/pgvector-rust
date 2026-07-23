@@ -80,11 +80,19 @@ impl SparseVector {
     pub(crate) fn from_sql(
         buf: &[u8],
     ) -> Result<SparseVector, Box<dyn std::error::Error + Sync + Send>> {
+        if buf.len() < 12 {
+            return Err("invalid length".into());
+        }
+
         let dim = i32::from_be_bytes(buf[0..4].try_into()?);
         let nnz = i32::from_be_bytes(buf[4..8].try_into()?).try_into()?;
         let unused = i32::from_be_bytes(buf[8..12].try_into()?);
         if unused != 0 {
             return Err("expected unused to be 0".into());
+        }
+
+        if (buf.len() - 12) / 8 != nnz || (buf.len() - 12) % 8 != 0 {
+            return Err("invalid length".into());
         }
 
         let mut indices = Vec::with_capacity(nnz);

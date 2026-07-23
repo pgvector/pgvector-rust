@@ -49,7 +49,16 @@ impl Bit {
 
     #[cfg(any(feature = "postgres", feature = "sqlx", feature = "diesel"))]
     pub(crate) fn from_sql(buf: &[u8]) -> Result<Bit, Box<dyn std::error::Error + Sync + Send>> {
+        if buf.len() < 4 {
+            return Err("invalid length".into());
+        }
+
         let len = i32::from_be_bytes(buf[0..4].try_into()?).try_into()?;
+
+        if buf.len() - 4 != len / 8 + i32::from(len % 8 != 0) {
+            return Err("invalid length".into());
+        }
+
         let data = buf[4..4 + (len + 7) / 8].to_vec();
 
         Ok(Bit { len, data })
