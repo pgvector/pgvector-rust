@@ -57,9 +57,8 @@ impl Vector {
         }
 
         let mut vec = Vec::with_capacity(dim);
-        for i in 0..dim {
-            let s = 4 + 4 * i;
-            vec.push(f32::from_be_bytes(buf[s..s + 4].try_into()?));
+        for v in buf[4..].chunks_exact(4) {
+            vec.push(f32::from_be_bytes(v.try_into()?));
         }
 
         Ok(Vector(vec))
