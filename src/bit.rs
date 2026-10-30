@@ -47,7 +47,7 @@ impl Bit {
         self.data.as_slice()
     }
 
-    #[cfg(any(feature = "postgres", feature = "sqlx", feature = "diesel"))]
+    #[cfg(any(feature = "postgres", feature = "sqlx", feature = "diesel", test))]
     pub(crate) fn from_sql(buf: &[u8]) -> Result<Bit, Box<dyn std::error::Error + Sync + Send>> {
         if buf.len() < 4 {
             return Err("invalid length".into());
@@ -88,5 +88,39 @@ mod tests {
         let vec = Bit::new(&[]);
         assert_eq!(0, vec.len());
         assert!(vec.is_empty());
+    }
+
+    #[test]
+    fn test_from_sql() {
+        assert_eq!(
+            Bit::new(&[true, false, true]),
+            Bit::from_sql(&[0, 0, 0, 3, 5 << 5]).unwrap()
+        );
+    }
+
+    #[test]
+    fn test_from_sql_zero_length() {
+        assert_eq!(
+            "invalid length",
+            Bit::from_sql(&[]).unwrap_err().to_string()
+        );
+    }
+
+    #[test]
+    fn test_from_sql_missing_data() {
+        assert_eq!(
+            "invalid length",
+            Bit::from_sql(&[0, 0, 0, 9, 0]).unwrap_err().to_string()
+        );
+    }
+
+    #[test]
+    fn test_from_sql_extra_data() {
+        assert_eq!(
+            "invalid length",
+            Bit::from_sql(&[0, 0, 0, 16, 0, 0, 0])
+                .unwrap_err()
+                .to_string()
+        );
     }
 }

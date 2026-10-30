@@ -76,7 +76,7 @@ impl SparseVector {
         vec
     }
 
-    #[cfg(any(feature = "postgres", feature = "sqlx", feature = "diesel"))]
+    #[cfg(any(feature = "postgres", feature = "sqlx", feature = "diesel", test))]
     pub(crate) fn from_sql(
         buf: &[u8],
     ) -> Result<SparseVector, Box<dyn std::error::Error + Sync + Send>> {
@@ -156,5 +156,31 @@ mod tests {
         assert_eq!(6, vec.dimensions());
         assert_eq!(&[0, 2, 4], vec.indices());
         assert_eq!(&[1.0, 2.0, 3.0], vec.values());
+    }
+
+    #[test]
+    fn test_from_sql() {
+        let mut buf = Vec::new();
+        buf.extend(6_i32.to_be_bytes());
+        buf.extend(3_i32.to_be_bytes());
+        buf.extend(0_i32.to_be_bytes());
+        buf.extend(0_i32.to_be_bytes());
+        buf.extend(2_i32.to_be_bytes());
+        buf.extend(4_i32.to_be_bytes());
+        buf.extend(1.0_f32.to_be_bytes());
+        buf.extend(2.0_f32.to_be_bytes());
+        buf.extend(3.0_f32.to_be_bytes());
+        assert_eq!(
+            SparseVector::from_dense(&[1.0, 0.0, 2.0, 0.0, 3.0, 0.0]),
+            SparseVector::from_sql(&buf).unwrap()
+        );
+    }
+
+    #[test]
+    fn test_from_sql_zero_length() {
+        assert_eq!(
+            "invalid length",
+            SparseVector::from_sql(&[]).unwrap_err().to_string()
+        );
     }
 }

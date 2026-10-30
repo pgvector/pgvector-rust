@@ -40,7 +40,7 @@ impl HalfVector {
         self.0.as_slice()
     }
 
-    #[cfg(any(feature = "postgres", feature = "sqlx", feature = "diesel"))]
+    #[cfg(any(feature = "postgres", feature = "sqlx", feature = "diesel", test))]
     pub(crate) fn from_sql(
         buf: &[u8],
     ) -> Result<HalfVector, Box<dyn std::error::Error + Sync + Send>> {
@@ -101,6 +101,65 @@ mod tests {
         assert_eq!(
             vec.as_slice(),
             &[f16::from_f32(1.0), f16::from_f32(2.0), f16::from_f32(3.0)]
+        );
+    }
+
+    #[test]
+    fn test_from_sql() {
+        let mut buf = Vec::new();
+        buf.extend(3_i16.to_be_bytes());
+        buf.extend(0_i16.to_be_bytes());
+        buf.extend(f16::from_f32(1.0).to_be_bytes());
+        buf.extend(f16::from_f32(2.0).to_be_bytes());
+        buf.extend(f16::from_f32(3.0).to_be_bytes());
+        assert_eq!(
+            HalfVector::from_f32_slice(&[1.0, 2.0, 3.0]),
+            HalfVector::from_sql(&buf).unwrap()
+        );
+    }
+
+    #[test]
+    fn test_from_sql_zero_length() {
+        assert_eq!(
+            "invalid length",
+            HalfVector::from_sql(&[]).unwrap_err().to_string()
+        );
+    }
+
+    #[test]
+    fn test_from_sql_missing_data() {
+        let mut buf = Vec::new();
+        buf.extend(2_i16.to_be_bytes());
+        buf.extend(0_i16.to_be_bytes());
+        buf.extend(f16::from_f32(1.0).to_be_bytes());
+        assert_eq!(
+            "invalid length",
+            HalfVector::from_sql(&buf).unwrap_err().to_string()
+        );
+    }
+
+    #[test]
+    fn test_from_sql_extra_data() {
+        let mut buf = Vec::new();
+        buf.extend(2_i16.to_be_bytes());
+        buf.extend(0_i16.to_be_bytes());
+        buf.extend(f16::from_f32(1.0).to_be_bytes());
+        buf.extend(f16::from_f32(2.0).to_be_bytes());
+        buf.extend(f16::from_f32(3.0).to_be_bytes());
+        assert_eq!(
+            "invalid length",
+            HalfVector::from_sql(&buf).unwrap_err().to_string()
+        );
+    }
+
+    #[test]
+    fn test_from_sql_non_zero_unused() {
+        let mut buf = Vec::new();
+        buf.extend(0_i16.to_be_bytes());
+        buf.extend(1_i16.to_be_bytes());
+        assert_eq!(
+            "expected unused to be 0",
+            HalfVector::from_sql(&buf).unwrap_err().to_string()
         );
     }
 }
