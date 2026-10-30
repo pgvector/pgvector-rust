@@ -183,4 +183,16 @@ mod tests {
             SparseVector::from_sql(&[]).unwrap_err().to_string()
         );
     }
+
+    #[test]
+    fn test_from_sql_non_zero_unused() {
+        let mut buf = Vec::new();
+        buf.extend(0_i32.to_be_bytes());
+        buf.extend(0_i32.to_be_bytes());
+        buf.extend(1_i32.to_be_bytes());
+        assert_eq!(
+            "expected unused to be 0",
+            SparseVector::from_sql(&buf).unwrap_err().to_string()
+        );
+    }
 }
