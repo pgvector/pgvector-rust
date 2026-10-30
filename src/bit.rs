@@ -17,7 +17,7 @@ impl Bit {
     /// Creates a bit string from a slice of bits.
     pub fn new(data: &[bool]) -> Bit {
         let len = data.len();
-        let mut bytes = vec![0; (len + 7) / 8];
+        let mut bytes = vec![0; len / 8 + usize::from(len % 8 != 0)];
         for (i, v) in data.iter().enumerate() {
             bytes[i / 8] |= u8::from(*v) << (7 - (i % 8));
         }
