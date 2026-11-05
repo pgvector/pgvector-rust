@@ -13,7 +13,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     client.execute("CREATE EXTENSION IF NOT EXISTS vector", &[])?;
     client.execute("DROP TABLE IF EXISTS documents", &[])?;
     client.execute(
-        "CREATE TABLE documents (id serial PRIMARY KEY, content text, embedding bit(1536))",
+        "CREATE TABLE documents (id serial PRIMARY KEY, content text, embedding bit(2048))",
         &[],
     )?;
 
@@ -51,7 +51,7 @@ fn embed(texts: &[&str], input_type: &str) -> Result<Vec<Vec<u8>>, Box<dyn Error
         .header("Authorization", &format!("Bearer {}", api_key))
         .send_json(serde_json::json!({
             "texts": texts,
-            "model": "embed-v4.0",
+            "model": "embed-v5.0-pro",
             "input_type": input_type,
             "embedding_types": &["ubinary"],
         }))?
